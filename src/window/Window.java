@@ -3,8 +3,12 @@ package window;
 import javax.swing.*;
 
 import controller.ShowController;
+import dao.ProgressDAO;
+
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.Font;
@@ -17,6 +21,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.rmi.server.UID;
 
 public class Window extends JFrame {
     private final JFrame frame;
@@ -28,15 +33,19 @@ public class Window extends JFrame {
     private final JLabel avgPageLabel;
     private final JLabel avgPAnsLabel;
     private final JLabel todayPageLabel;
+    private final JLabel progressLabel;
+
     private final JButton bookTitleButton;
     private final JButton logoButton;
+    private final JButton inputButton;
     private final JButton topButton;
     private final JButton settingsButton;
     private final JButton previousButton;
     private final JButton nextButton;
     private final JTextField avgText;
     private BufferedImage jordan;
-
+    private final JProgressBar progressBar;
+    private static int todayPages;
     public Window() {
 
         this.frame = new JFrame();
@@ -191,7 +200,35 @@ public class Window extends JFrame {
          * 
          * Button--------------------------------------------------
          */
+        //追加機能　バックアップテーブルを準備する
+        //         過去5日間の読んだページ数を日付とともに表示
+        this.inputButton = new JButton("入力");
+        inputButton.setPreferredSize(new Dimension(60, 25));
+        inputButton.addActionListener(new ActionListener() {
 
+            @Override
+            public void actionPerformed (ActionEvent e) {
+                try {
+                if (avgText.getText() == null) {
+                    return;
+                }
+                todayPages = Integer.valueOf(avgText.getText());
+                } catch (Exception exc) {
+                    exc.printStackTrace();
+                }
+                ProgressDAO pdao = new ProgressDAO();
+                pdao.insertTodayPage(todayPages);
+            }
+            
+        });
+        gbc.gridx = 5;
+        gbc.gridy = 8;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        gbc.anchor = GridBagConstraints.SOUTHEAST;
+        gbLayout.setConstraints(inputButton, gbc);
+        panel.add(this.inputButton);
+        
         this.topButton = new JButton("TOP");
         topButton.setPreferredSize(new Dimension(90, 25));
         gbc.gridx = 4;
@@ -259,6 +296,11 @@ public class Window extends JFrame {
         gbLayout.setConstraints(bookTitleButton, gbc);
         panel.add(this.bookTitleButton);
 
+
+        /*
+         * 
+         * 機能追加　好きな画像を選べるようにする
+         */
         try {
             jordan = ImageIO.read(new File("./src/image/images.jpg"));
         } catch (IOException e) {
@@ -285,10 +327,12 @@ public class Window extends JFrame {
                     size.height = -1;
                 }
                 Image scaled = jordan.getScaledInstance(size.width, size.height, Image.SCALE_SMOOTH);
-                achieveLabel.setIcon(new ImageIcon(scaled));
+                //////achieveLabel.setIcon(new ImageIcon(scaled));
             }
         });
-        this.achieveLabel.setText("達成率");
+
+
+        this.achieveLabel.setText("<html><center>達成率<br>30%</center></html>");
         this.achieveLabel.setVerticalTextPosition(JLabel.TOP);
         this.achieveLabel.setHorizontalTextPosition(JLabel.CENTER);
         this.achieveLabel.setBackground(Color.green);
@@ -298,15 +342,53 @@ public class Window extends JFrame {
         gbc.gridx = 2;
         gbc.gridy = 2;
         gbc.gridwidth = 2;
-        gbc.gridheight = 9;
+        /////////gbc.gridheight = 9;
         gbc.weightx = 1.0;
         gbc.weighty = 0.1;
-        gbc.insets = new Insets(0, 20, 0, 0);
+        gbc.insets = new Insets(0, 0, 0, 0);
         gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbLayout.setConstraints(achieveLabel, gbc);
-        panel.add(this.achieveLabel);
+        ///panel.add(this.achieveLabel);
         // panel2.add(this.achieveLabel, BorderLayout.CENTER);
         // getP.add(panel2, BorderLayout.WEST);
+
+        /*
+         * 
+         * Progress Bar
+         * 
+         */
+        
+        progressLabel = new JLabel();
+        progressLabel.setText("<html><center>達成率<br>30%</center></html>");
+        progressLabel.setBackground(Color.green);
+        progressLabel.setOpaque(true);
+        //progressLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        gbc.gridx = 2;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.1;
+        gbc.insets = new Insets(0, 0, 0, 0);
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.NONE;
+        gbLayout.setConstraints(progressLabel, gbc);
+        panel.add(progressLabel);
+
+        progressBar = new JProgressBar(JProgressBar.VERTICAL, 0, 100);
+        progressBar.setStringPainted(false);
+        progressBar.setValue(30);
+        //progressBar.setPreferredSize(new Dimension(50, 100));
+        gbc.gridx = 2;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.gridheight = 8;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbLayout.setConstraints(progressBar, gbc);
+        panel.add(progressBar);
+
         getP.add(panel);
     }
 
