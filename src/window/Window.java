@@ -2,6 +2,7 @@ package window;
 
 import javax.swing.*;
 
+import controller.ShowController;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
@@ -10,14 +11,8 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.LayoutManager;
 import java.awt.BorderLayout;
-
-import javax.swing.border.LineBorder;
-import java.awt.Graphics;
 import java.awt.Image;
-import image.Images;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -25,7 +20,7 @@ import java.io.IOException;
 
 public class Window extends JFrame {
     private final JFrame frame;
-    private final JLabel totalDLabel;
+    private final JLabel totalDayLabel;
     private final JLabel tDAnsLabel;
     private final JLabel remainPageLabel;
     private final JLabel rPAnsLabel;
@@ -53,6 +48,8 @@ public class Window extends JFrame {
         JPanel panel = new JPanel();
         JPanel panel2 = new JPanel();
         panel2.setLayout(new BorderLayout());
+        int bookId = 1;
+        ShowController showC = new ShowController();
 
         GridBagLayout gbLayout = new GridBagLayout();
         panel.setLayout(gbLayout);
@@ -81,14 +78,16 @@ public class Window extends JFrame {
 
         this.logoButton = new JButton("LOGO");
         gbc.fill = GridBagConstraints.NONE;
-        gbc.gridx = 4;
+        gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
         gbLayout.setConstraints(logoButton, gbc);
         panel.add(this.logoButton);
 
-        this.totalDLabel = new JLabel("読んだ日数");
+        this.totalDayLabel = new JLabel("読んだ日数");
+        this.totalDayLabel.setBackground(Color.green);
+        this.totalDayLabel.setOpaque(true);
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridx = 4;
         gbc.gridy = 2;
@@ -96,12 +95,12 @@ public class Window extends JFrame {
         gbc.gridheight = 1;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        totalDLabel.setFont(new Font("MS ゴシック", Font.PLAIN, 18));
+        totalDayLabel.setFont(new Font("MS ゴシック", Font.PLAIN, 18));
         // totalDLabel.setPreferredSize(new Dimension(200, 50));
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(0, 0, 0, 0);
-        gbLayout.setConstraints(totalDLabel, gbc);
-        panel.add(this.totalDLabel);
+        gbLayout.setConstraints(totalDayLabel, gbc);
+        panel.add(this.totalDayLabel);
 
         this.remainPageLabel = new JLabel("残りのページ");
         gbc.gridx = 4;
@@ -112,7 +111,7 @@ public class Window extends JFrame {
         gbLayout.setConstraints(remainPageLabel, gbc);
         panel.add(this.remainPageLabel);
 
-        this.avgPageLabel = new JLabel("1日の平均");
+        this.avgPageLabel = new JLabel("1日の平均ページ");
         gbc.gridx = 4;
         gbc.gridy = 6;
         gbc.gridwidth = 1;
@@ -126,8 +125,8 @@ public class Window extends JFrame {
          * 
          * 
          */
-
-        this.tDAnsLabel = new JLabel("500P");
+        // 要修正 bookidを直接指定ではなく変数で指定できるようにする。例:本を選択した時に変数に代入しそれを呼ぶ
+        this.tDAnsLabel = new JLabel(showC.totalDays(bookId) + "日");
         gbc.gridx = 5;
         gbc.gridy = 2;
         gbc.gridwidth = 1;
@@ -139,7 +138,7 @@ public class Window extends JFrame {
         gbLayout.setConstraints(tDAnsLabel, gbc);
         panel.add(this.tDAnsLabel);
 
-        this.rPAnsLabel = new JLabel("200P");
+        this.rPAnsLabel = new JLabel(showC.totalPages() + "P");
         gbc.gridx = 5;
         gbc.gridy = 4;
         gbc.gridwidth = 1;
@@ -148,7 +147,7 @@ public class Window extends JFrame {
         gbLayout.setConstraints(rPAnsLabel, gbc);
         panel.add(this.rPAnsLabel);
 
-        this.avgPAnsLabel = new JLabel("100P");
+        this.avgPAnsLabel = new JLabel(showC.average() + "P");
         gbc.gridx = 5;
         gbc.gridy = 6;
         gbc.gridwidth = 1;
@@ -259,29 +258,6 @@ public class Window extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         gbLayout.setConstraints(bookTitleButton, gbc);
         panel.add(this.bookTitleButton);
-
-        // this.achieveLabel = new JLabel("達成率:");
-
-        // BufferedImage jordan2 = null;
-        // try {
-        // jordan2 = ImageIO.read(new File("./src/image/images.jpg"));
-        // } catch (Exception e) {
-        // // inname(入力JPEG)の読み込みに失敗したときの処理
-        // e.printStackTrace();
-        // return;
-        // }
-        // double width = jordan2.getWidth();
-        // double height = jordan2.getHeight();
-        // int framewidth = frame.getWidth();
-        // int frameheight = frame.getHeight();
-        // Images image = new Images();
-        // image.setSize(width, height, framewidth, frameheight);
-        // jordan2 = new BufferedImage(image.getNewWidth(), image.getNewHeight(),
-        // BufferedImage.TYPE_INT_BGR);
-        // int wid = image.getNewWidth(); // 画像の幅
-        // int hei = image.getNewHeight(); // 画像の高さ
-        // Image jordanScale = jordan2.getScaledInstance(wid, hei, Image.SCALE_SMOOTH);
-        // this.achieveLabel.setIcon(new ImageIcon(jordanScale));
 
         try {
             jordan = ImageIO.read(new File("./src/image/images.jpg"));
