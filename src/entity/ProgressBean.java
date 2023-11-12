@@ -6,7 +6,7 @@ public class ProgressBean implements Serializable{
     private int id;
     private int today_pages;
     private int bookId;
-    private Timestamp dateTime;
+    private Timestamp createdAt;
 
 
     public int getId() {
@@ -27,10 +27,10 @@ public class ProgressBean implements Serializable{
     public void setBookid(int bookid) {
         this.bookId = bookid;
     }
-    public Timestamp getDatetime() {
-        return dateTime;
+    public Timestamp getCreatedAt() {
+        return createdAt;
     }
-    public void setDatetime(Timestamp datetime) {
-        this.dateTime = datetime;
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 }
