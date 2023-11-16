@@ -1,8 +1,13 @@
 package controller;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import dao.BooksDAO;
@@ -11,6 +16,8 @@ import dto.BooksDTO;
 import dto.ProgressDTO;
 import entity.BooksBean;
 import entity.ProgressBean;
+import entity.UserAccountsBean;
+
 import java.text.SimpleDateFormat;
 
 public class ShowController {
@@ -26,14 +33,6 @@ public class ShowController {
     public ShowController() {
         this.pdao = new ProgressDAO();
         this.bdao = new BooksDAO();
-        try {
-            pdto = pdao.select(1); // refact
-            bdto = bdao.selectAll();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        bb = bdto.get(0);
-        pb = pdto.get(0);
     }
 
     // 修正 select()でbookidを指定
@@ -51,7 +50,7 @@ public class ShowController {
     }
 
     /*
-     * DTO更新
+     * DTO更新（bookIdを指定）
      */
     public ProgressDTO updateDTO(int bookId) {
         try {
@@ -64,7 +63,7 @@ public class ShowController {
 
     /*
      * 
-     * 過去5日間のデータ
+     * 過去5日間のデータ（JTable用）
      */
     public List<String[]> RecentData(int bookId) {
         List<String[]> tableData = new ArrayList<>();
@@ -130,10 +129,10 @@ public class ShowController {
         }
         return cPages;
     }
+
     /*
      * 本の総ページ数
      */
-
     public int totalPages(int bookId) {
         int total = 0;
         try {
@@ -164,6 +163,10 @@ public class ShowController {
         }
     }
 
+    /*
+     * 進捗率
+     * （例外を防ぐため先に100を掛けて％を出す）
+     */
     public int progress(int bookId) {
         return (currentPages(bookId) * 100) / totalPages(bookId);
     }

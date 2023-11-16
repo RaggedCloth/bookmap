@@ -146,7 +146,6 @@ public class Window extends JFrame {
          * 
          * 
          */
-        // 要修正 bookidを直接指定ではなく変数で指定できるようにする。例:本を選択した時に変数に代入しそれを呼ぶ
         this.sumDaysAnsLabel = new JLabel(showC.sumDays(bookId) + "日");
         gbc.gridx = 5;
         gbc.gridy = 2;
