@@ -57,10 +57,11 @@ public class BooksDAO {
 
     public int selectTotalPages(int id) throws Exception {
         int result = 0;
-        String sql = "SELECT total_pages FROM swing.books WHERE id = " + id;
+        String sql = "SELECT total_pages FROM swing.books WHERE id = ?";
         connect();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
-            rs = ps.executeQuery(sql);
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
             while (rs.next()) {
                 BooksBean bb = new BooksBean();
                 bb.setTotalPages(rs.getInt("total_pages"));

@@ -7,7 +7,7 @@ public class UserAccountsBean implements Serializable {
     private String loginId;
     private String userName;
     private String hashedpassword;
-    private byte[] salt;
+    private String salt;
 
     public int getUserId() {
         return userId;
@@ -41,11 +41,11 @@ public class UserAccountsBean implements Serializable {
         this.hashedpassword = hashedpassword;
     }
 
-    public byte[] getSalt() {
+    public String getSalt() {
         return salt;
     }
 
-    public void setSalt(byte[] salt) {
+    public void setSalt(String salt) {
         this.salt = salt;
     }
 

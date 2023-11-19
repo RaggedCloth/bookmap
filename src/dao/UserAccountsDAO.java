@@ -35,6 +35,9 @@ public class UserAccountsDAO {
         }
     }
 
+    /*
+     * passwordとsaltをudtoに格納
+     */
     public UserAccountsDTO selectPassWithSalt(String loginId) throws Exception {
         UserAccountsDTO udto = new UserAccountsDTO();
         String sql = "SELECT hashed_password, salt FROM swing.user_accounts WHERE login_id = ?";
@@ -45,7 +48,7 @@ public class UserAccountsDAO {
             while (rs.next()) {
                 UserAccountsBean ub = new UserAccountsBean();
                 ub.setHashedpassword(rs.getString("hashed_password"));
-                ub.setSalt(rs.getBytes("salt"));
+                ub.setSalt(rs.getString("salt"));
                 udto.add(ub);
             }
         } catch (Exception e) {
@@ -58,16 +61,14 @@ public class UserAccountsDAO {
     /*
      * User登録
      */
-    public void subscribeUser(String loginId, String password, byte[] salt) {
-        rs = null;
-        int result = 0;
+    public void saveUserToDB(String loginId, String password, String salt) {
         String sql = "INSERT INTO swing.user_accounts(login_id, hashed_password, salt) VALUES(?, ?, ?)";
         connect();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, loginId);
             ps.setString(2, password);
-            ps.setBytes(3, salt);
-            result = ps.executeUpdate();
+            ps.setString(3, salt);
+            ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.text.SimpleDateFormat;
 
-
 import dto.ProgressDTO;
 import entity.ProgressBean;
 
@@ -84,7 +83,7 @@ public class ProgressDAO {
         List<String[]> data = new ArrayList<>();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             while (rs.next()) {
-                Timestamp timestampFromProgress = rs.getTimestamp("作成日時");                // StringをTimestampに変換
+                Timestamp timestampFromProgress = rs.getTimestamp("作成日時"); // StringをTimestampに変換
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy MM/dd");
                 String data1 = String.valueOf(rs.getInt("ページ数"));
                 String data2 = dateFormat.format(timestampFromProgress);
@@ -113,18 +112,22 @@ public class ProgressDAO {
         }
         disconnect();
         return result;
-
     }
-
-    // public int countDateTime(int bookId) {
-    // String sql = "SELECT COUNT(datetime) FROM swing.progress WHERE bookid =
-    // 1";
-    // return executeSql(sql);
-    // }
-
-    public int insertTodayPage(int todayPages, int bookId) {
-        String sql = "INSERT INTO swing.progress(today_pages, bookid) VALUES(" + todayPages + ", " + bookId + ")";
-        return updateSql(sql);
+    /*
+     * 今日のページ数登録
+     */
+    public void insertTodayPage(int todayPages, int bookId) {
+        String sql = "INSERT INTO swing.progress(today_pages, bookid) VALUES(?, ?)";
+        int result = 0;
+        connect();
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, todayPages);
+            ps.setInt(2, bookId);
+            result = ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        disconnect();
     }
 
     public int update(int id, int bookid, int todayPages) {
@@ -133,7 +136,7 @@ public class ProgressDAO {
     }
 
     public int delete(int bookId) {
-        String sql = "DELETE FROM swing.progress WHERE bookid = "+ bookId + " ORDER by id DESC LIMIT 1";
+        String sql = "DELETE FROM swing.progress WHERE bookid = " + bookId + " ORDER by id DESC LIMIT 1";
         return updateSql(sql);
     }
 

@@ -14,8 +14,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import controller.PasswordEncoder;
-import controller.ShowController;
-import dao.UserAccountsDAO;
 
 public class LoginForm {
     private final JFrame loginForm;
@@ -77,25 +75,30 @@ public class LoginForm {
          */
         loginButton = new JButton("Login");
         loginButton.setFont(new Font("Tahoma", Font.PLAIN, 18));
-        loginButton.setBounds(216, 180, 80, 35);
+        loginButton.setBounds(116, 180, 80, 35);
         loginButton.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
+                PasswordEncoder passEnc = new PasswordEncoder();
+
                 // テキストフィールドの値を変数に
                 String loginId = loginIdField.getText();
                 char[] passwordArray = passwordField.getPassword();
                 String password = new String(passwordArray);
-                PasswordEncoder passEnc = new PasswordEncoder();
-                // nullcheckのメソッドを作成して呼び出し
+
+                // textareaに文字が入力されているかの確認
                 if (!loginId.isEmpty()) {
-                    //passEnc.subscribe(loginId, password); 一時的な登録ボタンの代替コマンド　後で消す
+                    // passEnc.subscribe(loginId, password); //一時的な登録ボタンの代替コマンド 後で消す
+                    // userCheck()にloginIdとpasswordを渡して照合
                     boolean userIsVerified = passEnc.userCheck(loginId, password);
                     if (userIsVerified) {
-                    Window window = new Window();
-                    loginForm.setVisible(false);
-                    window.run();
+                        System.out.println("ログインしました。");
+                        Window window = new Window();
+                        loginForm.setVisible(false);
+                        window.run();
+                    } else {
+                        System.out.println("IDまたはパスワードが間違っています。");
                     }
-                    // コントローラーへuserNameとpasswordを渡して照合
                 } else {
                     System.out.println("ログインIDを入力してください");
                 }
@@ -107,7 +110,7 @@ public class LoginForm {
 
     public void run() {
         loginForm.setVisible(true);
-        //Window window = new Window();
-        //window.run();
+        // Window window = new Window();
+        // window.run();
     }
 }

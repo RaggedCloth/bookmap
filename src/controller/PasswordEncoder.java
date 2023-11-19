@@ -5,9 +5,8 @@ import java.security.SecureRandom;
 
 import dao.UserAccountsDAO;
 import dto.UserAccountsDTO;
-import entity.UserAccountsBean;
 
-import java.nio.charset.Charset;
+import entity.UserAccountsBean;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
@@ -16,17 +15,19 @@ public class PasswordEncoder {
     private UserAccountsDAO udao;
     private UserAccountsBean ub;
 
-    public static String sha256Encode(String password, byte[] salt) {
-        int iterateCount = 1000;
+    public static String sha256Encode(String password, String salt) {
+        int iterateCount = 10000;
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update(salt);
 
-            // パスワードをハッシュ化
-            byte[] hashedPassword = password.getBytes(StandardCharsets.UTF_8);
+            // パスワードとソルトを結合
+            String preparedHash = password + salt;
+
+            // byteに変換しハッシュ化
+            byte[] hashedPassword = preparedHash.getBytes(StandardCharsets.UTF_8);
             for (int i = 0; i < iterateCount; i++) {
-                hashedPassword = md.digest(hashedPassword);
                 md.reset();
+                hashedPassword = md.digest(hashedPassword);
             }
             // ハッシュ値を16進数の文字列に変換
             StringBuilder hexString = new StringBuilder();
@@ -43,27 +44,18 @@ public class PasswordEncoder {
     /*
      * salt
      */
-    public static byte[] getSHA256salt() {
-        byte[] hashedSalt = null;
+    public static String generateSalt() {
         byte[] salt = new byte[32];
-        SecureRandom secureRandom = new SecureRandom();
-        secureRandom.nextBytes(salt);
-
-        // ソルトをハッシュ化
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            hashedSalt = md.digest(salt);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return hashedSalt;
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(salt);
+        return byteToHexString(salt);
     }
 
-    // hashingメソッド内でsaltを生成せず、呼び出し元で生成してそれを引数としてhashingメソッドに渡す方が管理しやすい？
-    public static String hashing(String password) {
-        byte[] salt = getSHA256salt();
-        return sha256Encode(password, salt);
-    }
+    // // hashingメソッド内でsaltを生成せず、呼び出し元で生成してそれを引数としてhashingメソッドに渡す方が管理しやすい？
+    // public static String hashing(String password) {
+    // String salt = generateSalt();
+    // return sha256Encode(password, salt);
+    // }
 
     /*
      * ログイン
@@ -72,60 +64,89 @@ public class PasswordEncoder {
         boolean user = false;
         ub = new UserAccountsBean();
         udao = new UserAccountsDAO();
-        udto = new UserAccountsDTO();
+        // udto = new UserAccountsDTO();
         try {
+            // ログインIDでsqlを検索してuserに代入
             udto = udao.selectPassWithSalt(loginId);
-            for (int i = 0; i < udto.size(); i++) {
-                ub = udto.get(i);
-            }
-            // ユーザーIDでsqlを検索してuserに代入
-            if (ub != null) {
-                // beanからpasswordを取り出し、入力されたpasswordと照合
-                String hashedPassword = ub.getHashedpassword();
-                byte[] salt = ub.getSalt();
-                System.out.println(salt.toString());
-                // 入力されたpasswordをsaltを使いhash化
-                String inputPassword = sha256Encode(password, salt);
-                // passwordと照合
-                if (inputPassword.equals(hashedPassword)) {
-                    // trueならログイン falseならポップアップで警告
-                    System.out.println("ログインしました。");
-                    user = true;
-                } else {
-                    System.out.println("ログインできませんでした。");
-                }
-            } else {
-                System.out.println("ログインIDが存在しません。");
-            }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        // beanにデータをセット
+        for (int i = 0; i < udto.size(); i++) {
+            ub = udto.get(i);
+        }
+        // ログインIDの存在をチェック
+        if (ub.getSalt() == null) {
+            System.out.println("ログインIDが存在しません。");
+        } else if (ub != null) {
+            // beanからpasswordを取り出し、入力されたpasswordと照合
+            String hashedPassword = ub.getHashedpassword();
+            String salt = ub.getSalt();
+
+            // 入力されたpasswordをsaltを使いhash化
+            String inputPassword = sha256Encode(password, salt);
+
+            // passwordと照合
+            if (inputPassword.equals(hashedPassword)) {
+                user = true;
+            }
         }
         return user;
     }
 
     /*
      * userNameとハッシュ化したpasswordをデータベースに保存
+     * 追加機能
+     * （未実装）登録する前にselect文でユーザーIDを検索し、ユーザー名が存在したら警告
+     * 
      */
     public void subscribe(String loginId, String password) {
-        String sql = null;
-        byte[] salt = getSHA256salt();
+        String salt = generateSalt();
         String hashedPassword = sha256Encode(password, salt);
         udao = new UserAccountsDAO();
-        udao.subscribeUser(loginId, hashedPassword, salt);
+        // user_idで検索して、idが存在しなければsubscribeUserを実行しないようにする
+
+        udao.saveUserToDB(loginId, hashedPassword, salt);
     }
 
     /*
      * byteをhexに変換（可読性を上げるため）
      */
-    private static String bytesToHex(byte[] bytes) {
+    private static String byteToHexString(byte[] bytes) {
         StringBuilder hexString = new StringBuilder();
         for (byte b : bytes) {
-            String hex = Integer.toHexString(0xFF & b);
-            if (hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
+            hexString.append(String.format("%02x", b));
         }
         return hexString.toString();
+    }
+
+    /*
+     * *****よく確認してから実装すること*****
+     * パスワードのハッシュ化の方式を変更する時に
+     * これまでのユーザーの認証を確認してから、新しいパスワードの取り扱い方で新たに登録する
+     */
+    public boolean changeHashSpec(String loginId, String password, String salt) {
+        boolean user = false;
+        int userId = 100000;
+        // userIdの値をloginIdからDAOを呼び出し設定する
+
+        user = userCheck(loginId, password);
+        // userIdが変更加えた時の最大値以下であれば新たな方式への変更処理、最大値より上であれば通常の登録処理
+        if (userId <= 100 && user) {
+            /*
+             * ここに変更するパスワードのハッシュ化を入力
+             * 
+             * ********************重要**************************
+             * 新たにsubscribe()メソッドを作成し、
+             * loginIdはUniqueを指定しているので一度削除してから、
+             * 新しいpasswordとsaltと共に登録する
+             * **************************************************
+             */
+        } else if (userId > 100 && user) {
+            System.out.println("ログインしました");
+        } else {    //万が一を考えて else if (user == false) にするべき？
+            System.out.println("IDまたはパスワードが間違っています。");
+        }
+        return user;
     }
 }
