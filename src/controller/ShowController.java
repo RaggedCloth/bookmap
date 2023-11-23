@@ -1,13 +1,8 @@
 package controller;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import dao.BooksDAO;
@@ -16,7 +11,6 @@ import dto.BooksDTO;
 import dto.ProgressDTO;
 import entity.BooksBean;
 import entity.ProgressBean;
-import entity.UserAccountsBean;
 
 import java.text.SimpleDateFormat;
 
@@ -85,7 +79,7 @@ public class ShowController {
         int sumPage = 0;
         for (int i = 0; i < pdto.size(); i++) {
             pb = pdto.get(i);
-            sumPage += pb.getTodayPages();
+            sumPage += pb.getTodayProgress();
         }
 
         return String.valueOf(sumPage / sumDays(bookId));
@@ -105,7 +99,7 @@ public class ShowController {
             pb = pdto.get(i);
             timestampFromProgress = pb.getCreatedAt();
             nowDate = dateFormat.format(timestampFromProgress);
-            if (pb.getTodayPages() == 0) {
+            if (pb.getTodayProgress() == 0) {
                 continue;
             }
             if (nowDate.equals(previousDate)) {

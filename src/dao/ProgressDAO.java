@@ -13,7 +13,7 @@ import dto.ProgressDTO;
 import entity.ProgressBean;
 
 public class ProgressDAO {
-    private static final String URL = "jdbc:mysql://localhost:3306/swing";
+    private static final String URL = "jdbc:mysql://localhost:3306/bookmap";
     private static final String USER = "devuser01";
     private static final String PASS = "devuser01";
     Connection con = null;
@@ -42,16 +42,17 @@ public class ProgressDAO {
 
     public ProgressDTO select(int bookId) {
         ProgressDTO pdto = new ProgressDTO();
-        String sql = "SELECT * FROM swing.progress WHERE bookid = " + bookId;
+        String sql = "SELECT * FROM bookmap.progress WHERE book_id = " + bookId;
         try {
             connect();
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery(sql);
             while (rs.next()) {
                 ProgressBean pb = new ProgressBean();
-                pb.setBookid(rs.getInt("bookid"));
-                pb.setId(rs.getInt("id"));
-                pb.setTodayPages(rs.getInt("today_pages"));
+                pb.setBookId(rs.getInt("book_id"));
+                pb.setProgressId(rs.getInt("progress_id"));
+                pb.setUserId(rs.getInt("user_id"));
+                pb.setTodayProgress(rs.getInt("today_progress"));
                 pb.setCreatedAt(rs.getTimestamp("created_at"));
                 pdto.add(pb);
             }
@@ -72,9 +73,9 @@ public class ProgressDAO {
     }
 
     public List<String[]> select5RecentData(int bookId) throws Exception {
-        String sql = "SELECT today_pages AS 'ページ数', created_at AS '作成日時' " +
-                "FROM (SELECT * FROM swing.progress " +
-                "WHERE bookid = " + bookId + " " +
+        String sql = "SELECT today_progress AS 'ページ数', created_at AS '作成日時' " +
+                "FROM (SELECT * FROM bookmap.progress " +
+                "WHERE book_id = " + bookId + " " +
                 "ORDER BY created_at " +
                 "DESC LIMIT 5) AS subquery ORDER BY created_at ASC";
         connect();
@@ -98,14 +99,14 @@ public class ProgressDAO {
 
     public int selectCurrentPages(int bookId) throws Exception {
         int result = 0;
-        String sql = "SELECT today_pages FROM swing.progress WHERE bookid = " + bookId;
+        String sql = "SELECT today_progress FROM bookmap.progress WHERE book_id = " + bookId;
         connect();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             rs = ps.executeQuery(sql);
             while (rs.next()) {
                 ProgressBean pb = new ProgressBean();
-                pb.setTodayPages(rs.getInt("today_pages"));
-                result += pb.getTodayPages();
+                pb.setTodayProgress(rs.getInt("today_progress"));
+                result += pb.getTodayProgress();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -117,13 +118,12 @@ public class ProgressDAO {
      * 今日のページ数登録
      */
     public void insertTodayPage(int todayPages, int bookId) {
-        String sql = "INSERT INTO swing.progress(today_pages, bookid) VALUES(?, ?)";
-        int result = 0;
+        String sql = "INSERT INTO bookmap.progress(today_progress, book_id) VALUES(?, ?)";
         connect();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, todayPages);
             ps.setInt(2, bookId);
-            result = ps.executeUpdate();
+            ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -131,12 +131,12 @@ public class ProgressDAO {
     }
 
     public int update(int id, int bookid, int todayPages) {
-        String sql = "UPDATE swing.progress SET id = " + id + ", bookid = " + bookid + ", today_pages = " + todayPages;
+        String sql = "UPDATE bookmap.progress SET progress_id = " + id + ", book_id = " + bookid + ", today_progress = " + todayPages;
         return updateSql(sql);
     }
 
     public int delete(int bookId) {
-        String sql = "DELETE FROM swing.progress WHERE bookid = " + bookId + " ORDER by id DESC LIMIT 1";
+        String sql = "DELETE FROM bookmap.progress WHERE book_id = " + bookId + " ORDER by id DESC LIMIT 1";
         return updateSql(sql);
     }
 

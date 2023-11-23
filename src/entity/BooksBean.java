@@ -3,31 +3,50 @@ package entity;
 import java.io.Serializable;
 
 public class BooksBean implements Serializable {
-    private int Id;
-    private int total_pages;
-    private String name;
+    private int bookId;
+    private int totalPages;
+    private String title;
+    private int authorId;
+    private int genreId;
 
-    public int getId() {
-        return Id;
+    public int getBookId() {
+        return bookId;
     }
 
-    public void setId(int Id) {
-        this.Id = Id;
+    public void setBookId(int bookId) {
+        this.bookId = bookId;
     }
 
     public int getTotalPages() {
-        return total_pages;
+        return totalPages;
     }
 
     public void setTotalPages(int totalPages) {
-        this.total_pages = totalPages;
+        this.totalPages = totalPages;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
+
+    public int getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(int authorId) {
+        this.authorId = authorId;
+    }
+
+    public int getGenreId() {
+        return genreId;
+    }
+
+    public void setGenreId(int genreId) {
+        this.genreId = genreId;
+    }
+    
 }

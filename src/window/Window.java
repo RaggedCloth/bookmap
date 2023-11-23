@@ -1,6 +1,5 @@
 package window;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -57,7 +56,7 @@ public class Window extends JFrame {
     public Window() {
 
         this.frame = new JFrame();
-        frame.setTitle("book map");
+        frame.setTitle("Book MAP");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setBounds(1100, 100, 800, 700);
 
@@ -349,6 +348,14 @@ public class Window extends JFrame {
 
         this.bookTitleButton = new JButton("Book title");
         bookTitleButton.setPreferredSize(new Dimension(250, 25));
+        bookTitleButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+
+
+            }});
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.gridwidth = 2;

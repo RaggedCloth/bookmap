@@ -5,11 +5,11 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import dto.UserAccountsDTO;
-import entity.UserAccountsBean;
+import dto.UsersDTO;
+import entity.UsersBean;
 
-public class UserAccountsDAO {
-    private static final String URL = "jdbc:mysql://localhost:3306/swing";
+public class UsersDAO {
+    private static final String URL = "jdbc:mysql://localhost:3306/bookmap";
     private static final String USER = "devuser01";
     private static final String PASS = "devuser01";
     Connection con = null;
@@ -38,16 +38,16 @@ public class UserAccountsDAO {
     /*
      * passwordとsaltをudtoに格納
      */
-    public UserAccountsDTO selectPassWithSalt(String loginId) throws Exception {
-        UserAccountsDTO udto = new UserAccountsDTO();
-        String sql = "SELECT hashed_password, salt FROM swing.user_accounts WHERE login_id = ?";
+    public UsersDTO selectPassWithSalt(String loginId) throws Exception {
+        UsersDTO udto = new UsersDTO();
+        String sql = "SELECT hashed_password, salt FROM bookmap.users WHERE login_id = ?";
         connect();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, loginId);
             rs = ps.executeQuery();
             while (rs.next()) {
-                UserAccountsBean ub = new UserAccountsBean();
-                ub.setHashedpassword(rs.getString("hashed_password"));
+                UsersBean ub = new UsersBean();
+                ub.setHashedPassword(rs.getString("hashed_password"));
                 ub.setSalt(rs.getString("salt"));
                 udto.add(ub);
             }
@@ -62,7 +62,7 @@ public class UserAccountsDAO {
      * User登録
      */
     public void saveUserToDB(String loginId, String password, String salt) {
-        String sql = "INSERT INTO swing.user_accounts(login_id, hashed_password, salt) VALUES(?, ?, ?)";
+        String sql = "INSERT INTO bookmap.users(login_id, hashed_password, salt) VALUES(?, ?, ?)";
         connect();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, loginId);

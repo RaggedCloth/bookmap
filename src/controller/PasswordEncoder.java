@@ -3,17 +3,17 @@ package controller;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-import dao.UserAccountsDAO;
-import dto.UserAccountsDTO;
+import dao.UsersDAO;
+import dto.UsersDTO;
 
-import entity.UserAccountsBean;
+import entity.UsersBean;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 public class PasswordEncoder {
-    private UserAccountsDTO udto;
-    private UserAccountsDAO udao;
-    private UserAccountsBean ub;
+    private UsersDTO udto;
+    private UsersDAO udao;
+    private UsersBean ub;
 
     public static String sha256Encode(String password, String salt) {
         int iterateCount = 10000;
@@ -62,8 +62,8 @@ public class PasswordEncoder {
      */
     public boolean userCheck(String loginId, String password) {
         boolean user = false;
-        ub = new UserAccountsBean();
-        udao = new UserAccountsDAO();
+        ub = new UsersBean();
+        udao = new UsersDAO();
         // udto = new UserAccountsDTO();
         try {
             // ログインIDでsqlを検索してuserに代入
@@ -80,7 +80,7 @@ public class PasswordEncoder {
             System.out.println("ログインIDが存在しません。");
         } else if (ub != null) {
             // beanからpasswordを取り出し、入力されたpasswordと照合
-            String hashedPassword = ub.getHashedpassword();
+            String hashedPassword = ub.getHashedPassword();
             String salt = ub.getSalt();
 
             // 入力されたpasswordをsaltを使いhash化
@@ -103,7 +103,7 @@ public class PasswordEncoder {
     public void subscribe(String loginId, String password) {
         String salt = generateSalt();
         String hashedPassword = sha256Encode(password, salt);
-        udao = new UserAccountsDAO();
+        udao = new UsersDAO();
         // user_idで検索して、idが存在しなければsubscribeUserを実行しないようにする
 
         udao.saveUserToDB(loginId, hashedPassword, salt);
@@ -123,7 +123,7 @@ public class PasswordEncoder {
     /*
      * *****よく確認してから実装すること*****
      * パスワードのハッシュ化の方式を変更する時に
-     * これまでのユーザーの認証を確認してから、新しいパスワードの取り扱い方で新たに登録する
+     * これまでのユーザーの認証を確認してから、新しいパスワードの取り扱い方で新たにupdateする
      */
     public boolean changeHashSpec(String loginId, String password, String salt) {
         boolean user = false;
@@ -131,16 +131,16 @@ public class PasswordEncoder {
         // userIdの値をloginIdからDAOを呼び出し設定する
 
         user = userCheck(loginId, password);
-        // userIdが変更加えた時の最大値以下であれば新たな方式への変更処理、最大値より上であれば通常の登録処理
+        // userIdが変更加えた時の最大値以下であれば新たな方式へのupdate処理、最大値より上であれば通常の登録処理
         if (userId <= 100 && user) {
             /*
              * ここに変更するパスワードのハッシュ化を入力
              * 
-             * ********************重要**************************
-             * 新たにsubscribe()メソッドを作成し、
-             * loginIdはUniqueを指定しているので一度削除してから、
-             * 新しいpasswordとsaltと共に登録する
-             * **************************************************
+             * ********************重要**********************************
+             * 新しいpasswordとsaltと共にuser_idもupdateする
+             * user_idは主キーなので、
+             * 101と設定すれば自動でINCREMENTし、最大値になってくれる？(要確認)
+             * **********************************************************
              */
         } else if (userId > 100 && user) {
             System.out.println("ログインしました");

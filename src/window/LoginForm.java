@@ -57,19 +57,7 @@ public class LoginForm {
         password.setBounds(80, 120, 193, 52);
         loginPanel.add(password);
 
-        /*
-         * JTextField
-         */
-        loginIdField = new JTextField();
-        loginIdField.setFont(new Font("Tahoma", Font.PLAIN, 21));
-        loginIdField.setBounds(200, 77, 150, 35);
-        loginPanel.add(loginIdField);
-
-        passwordField = new JPasswordField();
-        passwordField.setFont(new Font("Tahoma", Font.PLAIN, 21));
-        passwordField.setBounds(200, 127, 150, 35);
-        loginPanel.add(passwordField);
-
+        
         /*
          * JButton
          */
@@ -81,8 +69,8 @@ public class LoginForm {
             public void actionPerformed(ActionEvent e) {
                 PasswordEncoder passEnc = new PasswordEncoder();
 
-                // テキストフィールドの値を変数に
-                String loginId = loginIdField.getText();
+                // フィールドのテキストを変数に
+                String loginId = loginIdField.getText().stripTrailing(); //末尾の空白を全て削除
                 char[] passwordArray = passwordField.getPassword();
                 String password = new String(passwordArray);
 
@@ -106,11 +94,27 @@ public class LoginForm {
         });
         loginPanel.add(loginButton);
         getP.add(loginPanel);
-    }
+    
+        /*
+         * JTextField
+         */
+        loginIdField = new JTextField();
+        loginIdField.setFont(new Font("Tahoma", Font.PLAIN, 21));
+        loginIdField.setBounds(200, 77, 150, 35);
+        loginPanel.add(loginIdField);
 
+        passwordField = new JPasswordField();
+        ActionListener[] loginEvent = loginButton.getActionListeners(); //loginButtonのActionListenerの配列を入れる
+        passwordField.addActionListener(loginEvent[0]);
+        passwordField.setFont(new Font("Tahoma", Font.PLAIN, 21));
+        passwordField.setBounds(200, 127, 150, 35);
+        loginPanel.add(passwordField);
+
+    }
     public void run() {
         loginForm.setVisible(true);
         // Window window = new Window();
         // window.run();
     }
+
 }

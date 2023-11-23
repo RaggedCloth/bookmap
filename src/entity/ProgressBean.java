@@ -2,35 +2,52 @@ package entity;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-public class ProgressBean implements Serializable{
-    private int id;
-    private int today_pages;
+
+public class ProgressBean implements Serializable {
+    private int progressId;
+    private int userId;
+    private int todayProgress;
     private int bookId;
     private Timestamp createdAt;
 
+    public int getProgressId() {
+        return progressId;
+    }
 
-    public int getId() {
-        return id;
+    public void setProgressId(int progressId) {
+        this.progressId = progressId;
     }
-    public void setId(int id) {
-        this.id = id;
+
+    public int getUserId() {
+        return userId;
     }
-    public int getTodayPages() {
-        return today_pages;
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
-    public void setTodayPages(int todayPages) {
-        this.today_pages = todayPages;
+
+    public int getTodayProgress() {
+        return todayProgress;
     }
-    public int getBookid() {
-        return bookId;
+
+    public void setTodayProgress(int todayProgress) {
+        this.todayProgress = todayProgress;
     }
-    public void setBookid(int bookid) {
-        this.bookId = bookid;
-    }
+
     public Timestamp getCreatedAt() {
         return createdAt;
     }
+
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
+
+    public int getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(int bookId) {
+        this.bookId = bookId;
+    }
+
 }

@@ -37,14 +37,14 @@ public class BooksDAO {
 
     public BooksDTO selectAll() throws Exception {
         BooksDTO bdto = new BooksDTO();
-        String sql = "SELECT * FROM swing.books";
+        String sql = "SELECT * FROM bookmap.books";
         connect();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             rs = ps.executeQuery(sql);
             while (rs.next()) {
                 BooksBean bb = new BooksBean();
-                bb.setId(rs.getInt("id"));
-                bb.setName(rs.getString("name"));
+                bb.setBookId(rs.getInt("book_id"));
+                bb.setTitle(rs.getString("title"));
                 bb.setTotalPages(rs.getInt("total_pages"));
                 bdto.add(bb);
             }
@@ -55,12 +55,12 @@ public class BooksDAO {
         return bdto;
     }
 
-    public int selectTotalPages(int id) throws Exception {
+    public int selectTotalPages(int bookId) throws Exception {
         int result = 0;
-        String sql = "SELECT total_pages FROM swing.books WHERE id = ?";
+        String sql = "SELECT total_pages FROM bookmap.books WHERE book_id = ?";
         connect();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, id);
+            ps.setInt(1, bookId);
             rs = ps.executeQuery();
             while (rs.next()) {
                 BooksBean bb = new BooksBean();

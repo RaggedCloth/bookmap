@@ -1,13 +1,16 @@
 package entity;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
-public class UserAccountsBean implements Serializable {
+public class UsersBean implements Serializable {
     private int userId;
     private String loginId;
     private String userName;
-    private String hashedpassword;
+    private String hashedPassword;
     private String salt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     public int getUserId() {
         return userId;
@@ -33,12 +36,12 @@ public class UserAccountsBean implements Serializable {
         this.userName = userName;
     }
 
-    public String getHashedpassword() {
-        return hashedpassword;
+    public String getHashedPassword() {
+        return hashedPassword;
     }
 
-    public void setHashedpassword(String hashedpassword) {
-        this.hashedpassword = hashedpassword;
+    public void setHashedPassword(String hashedPassword) {
+        this.hashedPassword = hashedPassword;
     }
 
     public String getSalt() {
@@ -47,6 +50,22 @@ public class UserAccountsBean implements Serializable {
 
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
 }
