@@ -2,7 +2,7 @@ package entity;
 
 import java.io.Serializable;
 
-public class Author implements Serializable {
+public class AuthorBean implements Serializable {
     private int authorId;
     private String authorName;
 

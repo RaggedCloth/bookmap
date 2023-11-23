@@ -2,7 +2,7 @@ package entity;
 
 import java.io.Serializable;
 
-public class Genres implements Serializable {
+public class GenresBean implements Serializable {
     private int genreId;
     private String genreName;
 
