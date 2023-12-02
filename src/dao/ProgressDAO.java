@@ -40,13 +40,14 @@ public class ProgressDAO {
         }
     }
 
-    public ProgressDTO select(int bookId) {
+    public ProgressDTO select(int userId, int bookId) {
         ProgressDTO pdto = new ProgressDTO();
-        String sql = "SELECT * FROM bookmap.progress WHERE book_id = " + bookId;
-        try {
-            connect();
-            ps = con.prepareStatement(sql);
-            rs = ps.executeQuery(sql);
+        String sql = "SELECT * FROM bookmap.progress WHERE user_id = ? AND book_id = ?";
+        connect();
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, bookId);
+            rs = ps.executeQuery();
             while (rs.next()) {
                 ProgressBean pb = new ProgressBean();
                 pb.setBookId(rs.getInt("book_id"));
@@ -58,33 +59,51 @@ public class ProgressDAO {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null)
-                    rs.close();
-                if (ps != null)
-                    ps.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
         disconnect();
         return pdto;
     }
-
-    public List<String[]> select5RecentData(int bookId) throws Exception {
-        String sql = "SELECT today_progress AS 'ページ数', created_at AS '作成日時' " +
-                "FROM (SELECT * FROM bookmap.progress " +
-                "WHERE book_id = " + bookId + " " +
-                "ORDER BY created_at " +
-                "DESC LIMIT 5) AS subquery ORDER BY created_at ASC";
+    /*
+     * 本のタイトル名から本のIDを取得
+     * （要修正）BookDAOに移動
+     */
+    public int searchBookId(int userId, String bookTitle) {
+        int id = 0;
+        String sql = "SELECT Distinct b.book_id FROM books b " +
+                "INNER JOIN progress p ON b.book_id = p.book_id " +
+                "WHERE p.user_id = ? AND b.title = ?";
         connect();
-        ps = con.prepareStatement(sql);
-        rs = ps.executeQuery(sql);
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setString(2, bookTitle);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                id = rs.getInt("book_id");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        disconnect();
+        return id;
+    }
+
+    /*
+     * 最新データ5件取得
+     */
+    public List<String[]> select5RecentData(int userId, int bookId) throws Exception {
+        String sql = "SELECT today_progress AS 'ページ数', created_at AS '日時' " +
+                "FROM (SELECT * FROM bookmap.progress " +
+                "WHERE user_id = ? AND book_id = ? " +
+                "ORDER BY created_at DESC LIMIT 5) " +
+                "AS latest ORDER BY created_at ASC";
+        connect();
         List<String[]> data = new ArrayList<>();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, bookId);
+            rs = ps.executeQuery();
             while (rs.next()) {
-                Timestamp timestampFromProgress = rs.getTimestamp("作成日時"); // StringをTimestampに変換
+                Timestamp timestampFromProgress = rs.getTimestamp("日時");
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy MM/dd");
                 String data1 = String.valueOf(rs.getInt("ページ数"));
                 String data2 = dateFormat.format(timestampFromProgress);
@@ -97,12 +116,17 @@ public class ProgressDAO {
         return data;
     }
 
-    public int selectCurrentPages(int bookId) throws Exception {
+    /*
+     * 読んだ合計のページ数
+     */
+    public int selectCurrentPages(int userId, int bookId) throws Exception {
         int result = 0;
-        String sql = "SELECT today_progress FROM bookmap.progress WHERE book_id = " + bookId;
+        String sql = "SELECT today_progress FROM bookmap.progress WHERE user_id = ? AND book_id = ?";
         connect();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
-            rs = ps.executeQuery(sql);
+            ps.setInt(1, userId);
+            ps.setInt(2, bookId);
+            rs = ps.executeQuery();
             while (rs.next()) {
                 ProgressBean pb = new ProgressBean();
                 pb.setTodayProgress(rs.getInt("today_progress"));
@@ -114,15 +138,17 @@ public class ProgressDAO {
         disconnect();
         return result;
     }
+
     /*
      * 今日のページ数登録
      */
-    public void insertTodayPage(int todayPages, int bookId) {
-        String sql = "INSERT INTO bookmap.progress(today_progress, book_id) VALUES(?, ?)";
+    public void insertTodayPage(int userId, int bookId, int todayProgress) {
+        String sql = "INSERT INTO bookmap.progress(user_id, book_id, today_progress) VALUES(?, ?, ?)";
         connect();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, todayPages);
+            ps.setInt(1, userId);
             ps.setInt(2, bookId);
+            ps.setInt(3, todayProgress);
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -130,37 +156,19 @@ public class ProgressDAO {
         disconnect();
     }
 
-    public int update(int id, int bookid, int todayPages) {
-        String sql = "UPDATE bookmap.progress SET progress_id = " + id + ", book_id = " + bookid + ", today_progress = " + todayPages;
-        return updateSql(sql);
-    }
-
-    public int delete(int bookId) {
-        String sql = "DELETE FROM bookmap.progress WHERE book_id = " + bookId + " ORDER by id DESC LIMIT 1";
-        return updateSql(sql);
-    }
-
-    public int updateSql(String sql) {
-        rs = null;
-        int result = 0;
-        try {
-            connect();
-            ps = con.prepareStatement(sql);
-            result = ps.executeUpdate(sql);
+    /*
+     * 最新データ1件削除
+     */
+    public void delete(int userId, int bookId) {
+        String sql = "DELETE FROM bookmap.progress WHERE user_id = ? AND book_id = ? ORDER by progress_id DESC LIMIT 1";
+        connect();
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, bookId);
+            ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null)
-                    rs.close();
-                if (ps != null)
-                    ps.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
         disconnect();
-        return result;
     }
-
 }

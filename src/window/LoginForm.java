@@ -23,7 +23,12 @@ public class LoginForm {
     private JPasswordField passwordField;
     private JButton loginButton;
     private JPanel loginPanel;
+    private JButton subscribeButton;
     Window window;
+    private int[] userData = new int[2];
+    private int userId;
+    private int previousBookId;
+    
 
     public LoginForm() {
         /*
@@ -57,10 +62,22 @@ public class LoginForm {
         password.setBounds(80, 120, 193, 52);
         loginPanel.add(password);
 
-        
         /*
          * JButton
          */
+        subscribeButton = new JButton("Sign up");
+        subscribeButton.setFont(new Font("Tahoma", Font.PLAIN, 18));
+        subscribeButton.setBounds(250, 180, 94, 35);
+        subscribeButton.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                Window window = new Window(1,1); //デバッグ用　後で登録ボタンに変更
+                loginForm.setVisible(false);
+                window.run();
+            }
+        });
+        loginPanel.add(subscribeButton);
+
         loginButton = new JButton("Login");
         loginButton.setFont(new Font("Tahoma", Font.PLAIN, 18));
         loginButton.setBounds(116, 180, 80, 35);
@@ -70,7 +87,7 @@ public class LoginForm {
                 PasswordEncoder passEnc = new PasswordEncoder();
 
                 // フィールドのテキストを変数に
-                String loginId = loginIdField.getText().stripTrailing(); //末尾の空白を全て削除
+                String loginId = loginIdField.getText().stripTrailing(); // 末尾の空白を全て削除
                 char[] passwordArray = passwordField.getPassword();
                 String password = new String(passwordArray);
 
@@ -81,7 +98,10 @@ public class LoginForm {
                     boolean userIsVerified = passEnc.userCheck(loginId, password);
                     if (userIsVerified) {
                         System.out.println("ログインしました。");
-                        Window window = new Window();
+                        userData = passEnc.getUserData(loginId);
+                        userId = userData[0];
+                        previousBookId = userData[1];
+                        Window window = new Window(userId, previousBookId);
                         loginForm.setVisible(false);
                         window.run();
                     } else {
@@ -94,7 +114,7 @@ public class LoginForm {
         });
         loginPanel.add(loginButton);
         getP.add(loginPanel);
-    
+
         /*
          * JTextField
          */
@@ -104,13 +124,14 @@ public class LoginForm {
         loginPanel.add(loginIdField);
 
         passwordField = new JPasswordField();
-        ActionListener[] loginEvent = loginButton.getActionListeners(); //loginButtonのActionListenerの配列を入れる
+        ActionListener[] loginEvent = loginButton.getActionListeners(); // loginButtonのActionListenerの配列を入れる
         passwordField.addActionListener(loginEvent[0]);
         passwordField.setFont(new Font("Tahoma", Font.PLAIN, 21));
         passwordField.setBounds(200, 127, 150, 35);
         loginPanel.add(passwordField);
 
     }
+
     public void run() {
         loginForm.setVisible(true);
         // Window window = new Window();

@@ -96,15 +96,15 @@ public class PasswordEncoder {
 
     /*
      * userNameとハッシュ化したpasswordをデータベースに保存
-     * 追加機能
-     * （未実装）登録する前にselect文でユーザーIDを検索し、ユーザー名が存在したら警告
+     * 
+     * （未実装）登録する前にselect文でユーザーIDを検索し、存在したら警告
      * 
      */
     public void subscribe(String loginId, String password) {
         String salt = generateSalt();
         String hashedPassword = sha256Encode(password, salt);
         udao = new UsersDAO();
-        // user_idで検索して、idが存在しなければsubscribeUserを実行しないようにする
+        // user_idで検索して、idが存在しなければsaveUserToDBを実行しないようにする
 
         udao.saveUserToDB(loginId, hashedPassword, salt);
     }
@@ -118,6 +118,12 @@ public class PasswordEncoder {
             hexString.append(String.format("%02x", b));
         }
         return hexString.toString();
+    }
+    /*
+     * loginIdからuserIdとprogressテーブルで最新データのbookIdを返す
+     */
+    public int[] getUserData(String loginId) {
+        return udao.searchIds(loginId);
     }
 
     /*
