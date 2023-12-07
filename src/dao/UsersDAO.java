@@ -57,14 +57,16 @@ public class UsersDAO {
         disconnect();
         return udto;
     }
+
     /*
      * loginIdからuserIdとbookIdを取得
      */
     public int[] searchIds(String loginId) {
         int[] ids = new int[2];
-        String sql = "SELECT p.user_id, p.book_id FROM progress p "+ 
-                "INNER JOIN users u ON p.user_id = u.user_id " + 
-                "WHERE u.login_id = ? " + 
+        String sql = "SELECT ub.user_id, ub.book_id FROM user_books ub " +
+                "INNER JOIN users u ON ub.user_id = u.user_id " +
+                "LEFT JOIN progress p ON ub.user_id = p.user_id " +
+                "WHERE u.login_id = ? " +
                 "ORDER BY p.created_at DESC LIMIT 1";
         connect();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -80,6 +82,7 @@ public class UsersDAO {
         disconnect();
         return ids;
     }
+
     /*
      * User登録
      */

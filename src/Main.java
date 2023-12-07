@@ -1,5 +1,4 @@
 import window.LoginForm;
-import window.Window;
 import javax.swing.SwingUtilities;
 
 public class Main {

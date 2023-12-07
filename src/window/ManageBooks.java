@@ -1,11 +1,10 @@
 package window;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
-
+import javax.swing.event.TableModelListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -26,6 +25,7 @@ public class ManageBooks {
     private final JLabel genreLabel;
     private final JLabel totalPagesLabel;
     private final JLabel errorMessageLabel;
+    private final JLabel updatedMessageLabel;
     private final JTextField inputTitle;
     private final JTextField inputAuthor;
     private final JTextField inputGenre;
@@ -35,7 +35,11 @@ public class ManageBooks {
     private String addGenre;
     private String errorMessage;
     private int addTotalPages;
-    
+    private String updatedMessage;
+    LabelTimer labelTimer;
+    Timer timer;
+    int sec = 0;
+
     public ManageBooks(int userId) {
         /*
          * Frame
@@ -57,18 +61,34 @@ public class ManageBooks {
         /*
          * Table
          */
-        booksModel = new DefaultTableModel();
-        booksModel.addColumn("タイトル");
-        booksModel.addColumn("著者");
-        booksModel.addColumn("ジャンル");
-        booksModel.addColumn("ページ数");
-
-        // Modelにデータを格納
-        List<String[]> booksData = new ArrayList<>();
-        booksData = showC.getBookTable(userId);
-        for (String[] bRow : booksData) {
-            booksModel.addRow(bRow);
-        }
+        booksModel = showC.getBookShelfModel(userId);
+        labelTimer = new LabelTimer();
+        booksModel.addTableModelListener(new TableModelListener() {
+            /*
+             * Tableの編集処理
+             * row,columnをshowCからDAOに送ってその結果をJLabelで受け取る
+             */
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                if (e.getType() == TableModelEvent.UPDATE) {
+                    int sortedRow = e.getFirstRow();
+                    int originalRow = bookListTable.convertRowIndexToModel(sortedRow);
+                    int column = e.getColumn();
+                    DefaultTableModel model = (DefaultTableModel) e.getSource();
+                    Object editedDataObject = model.getValueAt(originalRow, column);
+                    if (editedDataObject instanceof String) {
+                        String editedData = (String) editedDataObject;
+                        updatedMessage = showC.editBookData(originalRow, column, editedData);
+                    } else {
+                        System.out.println("不正な値が入力されました。文字列でお願いします。");
+                    }
+                    updatedMessageLabel.setText(updatedMessage);
+                    updatedMessageLabel.setVisible(true);
+                    timer = new Timer(5000, labelTimer);
+                    timer.start();
+                }
+            }
+        });
 
         // ModelをTableに入れる
         bookListTable = new JTable(booksModel);
@@ -103,9 +123,6 @@ public class ManageBooks {
                     }
                 }
                 String result = showC.addBook(userId, addTitle, addAuthor, addGenre, addTotalPages);
-                List<String> booksData = new ArrayList<>();
-                
-                
                 System.out.println(result);
             }
         });
@@ -153,7 +170,13 @@ public class ManageBooks {
         sLayout.putConstraint(SpringLayout.SOUTH, errorMessageLabel, 29, SpringLayout.SOUTH, genreLabel);
         sLayout.putConstraint(SpringLayout.EAST, errorMessageLabel, -80, SpringLayout.EAST, bPanel);
         bPanel.add(errorMessageLabel);
-        
+
+        updatedMessageLabel = new JLabel();
+        updatedMessageLabel.setVisible(false);
+        sLayout.putConstraint(SpringLayout.SOUTH, updatedMessageLabel, 20, SpringLayout.SOUTH, booksScrollPane);
+        sLayout.putConstraint(SpringLayout.EAST, updatedMessageLabel, -30, SpringLayout.EAST, bPanel);
+        bPanel.add(updatedMessageLabel);
+
         /*
          * TextField
          */
@@ -174,7 +197,7 @@ public class ManageBooks {
         sLayout.putConstraint(SpringLayout.SOUTH, inputGenre, 29, SpringLayout.SOUTH, inputAuthor);
         sLayout.putConstraint(SpringLayout.WEST, inputGenre, 58, SpringLayout.WEST, genreLabel);
         bPanel.add(inputGenre);
-        
+
         inputTotalPages = new JTextField();
         inputTotalPages.setPreferredSize(new Dimension(200, 24));
         inputTotalPages.addKeyListener(new KeyListener() {
@@ -184,12 +207,13 @@ public class ManageBooks {
                 char c = e.getKeyChar();
                 if (!(Character.isDigit(c) || c == KeyEvent.VK_BACK_SPACE || c == KeyEvent.VK_DELETE)) {
                     e.consume();
-
                 }
             }
+
             @Override
             public void keyPressed(KeyEvent e) {
             }
+
             @Override
             public void keyReleased(KeyEvent e) {
             }
@@ -199,7 +223,16 @@ public class ManageBooks {
         bPanel.add(inputTotalPages);
 
         getBooksPanel.add(bPanel, BorderLayout.CENTER);
-
+    }
+    /*
+     * 本のTableを編集後、5秒間updatedMessageLabelを表示
+     */
+    class LabelTimer implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            timer.stop();
+            updatedMessageLabel.setVisible(false);
+        }
     }
 
     public void run() {

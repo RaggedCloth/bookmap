@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "BookShelf",
+            "request": "launch",
+            "mainClass": "window.BookShelf",
+            "projectName": "bookmap_9ce73f90"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"

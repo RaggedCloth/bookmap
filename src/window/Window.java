@@ -12,12 +12,10 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-//import com.mysql.cj.x.protobuf.MysqlxDatatypes.Object;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import controller.ShowController;
-import dao.ProgressDAO;
 
 public class Window extends JFrame {
     private static int todayProgress;
@@ -48,12 +46,15 @@ public class Window extends JFrame {
     private final JTextField avgText;
     private final JProgressBar progressBar;
     private final JComboBox<String> bookShelfCombo;
+    private final DefaultComboBoxModel<String> comboModel;
     private final ShowController showC;
     private BufferedImage jordan;
     private int bookId;
     private String inputTitle;
     private List<String[]> booksData = new ArrayList<>();
     private List<String> bookList;
+    private ManageBooks mBooks;
+
     public Window(int userId, int previousBookId) {
 
         this.frame = new JFrame();
@@ -65,7 +66,7 @@ public class Window extends JFrame {
         JPanel panel = new JPanel();
         // JPanel panel2 = new JPanel();
         // panel2.setLayout(new BorderLayout());
-        
+
         this.bookId = previousBookId;
         showC = new ShowController(userId, bookId);
 
@@ -104,7 +105,7 @@ public class Window extends JFrame {
         gbc.gridheight = 1;
         gbLayout.setConstraints(logoButton, gbc);
         panel.add(this.logoButton);
-        
+
         this.sumDaysLabel = new JLabel("読んだ日数");
         this.sumDaysLabel.setBackground(Color.green);
         this.sumDaysLabel.setOpaque(true);
@@ -206,7 +207,7 @@ public class Window extends JFrame {
         panel.add(recentData.getTableHeader(), gbc);
         // panel.add(scrollPane, gbc);
         panel.add(recentData);
-        
+
         booksModel = new DefaultTableModel();
         booksModel.addColumn("タイトル");
         booksModel.addColumn("著者");
@@ -220,7 +221,6 @@ public class Window extends JFrame {
         for (String[] bRow : booksData) {
             booksModel.addRow(bRow);
         }
-        
 
         /*
          * 削除ボタン
@@ -293,8 +293,7 @@ public class Window extends JFrame {
                     return;
                 } else {
                     todayProgress = Integer.valueOf(avgText.getText());
-                    ProgressDAO pdao = new ProgressDAO();       //要修正：showCから呼ぶ
-                    pdao.insertTodayPage(userId, bookId, todayProgress);
+                    showC.addRecentData(userId, bookId, todayProgress);
                 }
                 updateText(userId, bookId);
             }
@@ -367,7 +366,7 @@ public class Window extends JFrame {
          * (未使用)
          */
         this.addBookButton = new JButton("追加");
-        
+
         addBookButton.addActionListener(new ActionListener() {
 
             @Override
@@ -380,8 +379,12 @@ public class Window extends JFrame {
          * JComboBox
          */
         bookList = showC.getBookList(userId, bookId);
-        bookShelfCombo = new JComboBox<>(bookList.toArray(new String[0])); // toArray(new String[0]) 長さが足りない場合は新しい配列を作りコピーしてくれる
-        bookShelfCombo.setSelectedItem(bookList);
+        comboModel = new DefaultComboBoxModel<>();
+        bookShelfCombo = new JComboBox<>(comboModel);
+        for (String bl : bookList) {
+            comboModel.addElement(bl);
+        }
+        bookShelfCombo.setSelectedIndex(bookId);
         bookShelfCombo.setPreferredSize(new Dimension(190, 25));
         bookShelfCombo.addActionListener(new ActionListener() {
 
@@ -390,9 +393,8 @@ public class Window extends JFrame {
                 String bookTitle;
                 bookTitle = String.valueOf(bookShelfCombo.getSelectedItem());
                 bookId = showC.getBookId(userId, bookTitle);
-                showC.updateDTO(userId, bookId);
+                // showC.updateDTO(userId, bookId);
                 updateText(userId, bookId);
-                frame.repaint();    
             }
         });
         gbc.gridx = 2;
@@ -402,11 +404,11 @@ public class Window extends JFrame {
         gbc.insets = new Insets(0, 0, 0, 0);
         // gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
-        //gbLayout.setConstraints(addBookButton, gbc);
+        // gbLayout.setConstraints(addBookButton, gbc);
         gbLayout.setConstraints(bookShelfCombo, gbc);
-        //panel.add(this.addBookButton);
+        // panel.add(this.addBookButton);
         panel.add(this.bookShelfCombo);
-        
+
         /*
          * 詳細ボタン
          * 本の追加と削除のウィンドウ表示
@@ -417,7 +419,9 @@ public class Window extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                ManageBooks mBooks = new ManageBooks(userId);
+                if (mBooks == null) {
+                    mBooks = new ManageBooks(userId);
+                }
                 mBooks.run();
             }
         });
@@ -540,7 +544,10 @@ public class Window extends JFrame {
         for (String[] row : tableData) {
             progressModel.addRow(row);
         }
-        bookList = showC.getBookList(userId, bookId);
-        bookShelfCombo.setSelectedItem(bookList);
+        // comboModel.removeAllElements();
+        // bookList = showC.getBookList(userId, bookId);
+        // for (String bl : bookList) {
+        // comboModel.addElement(bl);
+        // }
     }
 }

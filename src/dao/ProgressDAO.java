@@ -70,8 +70,9 @@ public class ProgressDAO {
     public int searchBookId(int userId, String bookTitle) {
         int id = 0;
         String sql = "SELECT Distinct b.book_id FROM books b " +
-                "INNER JOIN progress p ON b.book_id = p.book_id " +
-                "WHERE p.user_id = ? AND b.title = ?";
+        "LEFT OUTER JOIN user_books ub ON b.book_id = ub.book_id " +
+        "LEFT OUTER JOIN progress p ON ub.user_id = p.user_id " +
+        "WHERE ub.user_id = ? AND b.title = ?";
         connect();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, userId);

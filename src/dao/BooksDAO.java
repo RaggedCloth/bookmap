@@ -7,14 +7,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.LinkedHashSet;
 import dto.BooksDTO;
 import entity.BooksBean;
-import entity.ProgressBean;
 
 public class BooksDAO {
-    private static final String URL = "jdbc:mysql://localhost:3306/swing";
+    private static final String URL = "jdbc:mysql://localhost:3306/bookmap";
     private static final String USER = "devuser01";
     private static final String PASS = "devuser01";
     Connection con = null;
@@ -124,9 +122,9 @@ public class BooksDAO {
     public List<String> searchBookList(int userId) {
         List<String> allBookTitle = new ArrayList<>();
         List<String> bookTitle;
-        String sql = "SELECT b.title, u.created_at FROM bookmap.user_books u " +
-                "RIGHT OUTER JOIN bookmap.books b ON u.book_id = b.book_id " +
-                "WHERE u.user_id = ? ORDER BY u.created_at DESC;";
+        String sql = "SELECT b.title FROM bookmap.user_books ub " +
+                "RIGHT OUTER JOIN bookmap.books b ON ub.book_id = b.book_id " +
+                "WHERE ub.user_id = ?";
         connect();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, userId);
@@ -216,33 +214,4 @@ public class BooksDAO {
             disconnect();
         }
     }
-    // String sql = "START TRANSACTION;" +
-    // "INSERT INTO bookmap.books(title, total_pages) " +
-    // "VALUES(?, ?);" + // 1:title, 2:totalPaegs
-
-    // "INSERT INTO bookmap.authors(author_name) " +
-    // "VALUES(?);" + // 3:authorName
-
-    // "INSERT INTO bookmap.genres(genre_name) " +
-    // "VALUES(?);" + // 4:genreName
-
-    // "INSERT INTO bookmap.progress(user_id, book_id) " +
-    // "VALUES (?, (SELECT book_id FROM bookmap.books b " + // 5:userId
-    // "WHERE b.title = ?));" + // 6:title
-
-    // "COMMIT";
-    // connect();
-    // try (PreparedStatement ps = con.prepareStatement(sql)) {
-    // ps.setString(1, title);
-    // ps.setInt(2, totalPages);
-    // ps.setString(3, authorName);
-    // ps.setString(4, genreName);
-    // ps.setInt(5, userId);
-    // ps.setString(6, title);
-    // ps.executeUpdate();
-    // } catch (Exception e) {
-    // e.printStackTrace();
-    // }
-    // disconnect();
-    // }
 }

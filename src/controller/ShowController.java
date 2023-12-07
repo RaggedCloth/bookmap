@@ -5,14 +5,14 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import dao.BookShelfDAO;
 import dao.BooksDAO;
 import dao.ProgressDAO;
 import dto.BooksDTO;
 import dto.ProgressDTO;
-import entity.BooksBean;
 import entity.ProgressBean;
-
 import java.text.SimpleDateFormat;
+import javax.swing.table.DefaultTableModel;
 
 public class ShowController {
     private ProgressDTO pdto;
@@ -20,7 +20,7 @@ public class ShowController {
     private ProgressBean pb;
     private BooksDTO bdto;
     private BooksDAO bdao;
-    private BooksBean bb;
+    private BookShelfDAO bsdao = new BookShelfDAO();
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy MM/dd");
     private Timestamp timestampFromProgress;
 
@@ -88,10 +88,10 @@ public class ShowController {
         String result;
         // hasBook = bdao.searchBook(title);
         // if (!hasBook) {
-            bdao.registerBook(userId, title, authorName, genreName, totalPages);
-            result = "登録しました。";
+        bdao.registerBook(userId, title, authorName, genreName, totalPages);
+        result = "登録しました。";
         // } else {
-        //     result = "既に登録されている本です。";
+        // result = "既に登録されている本です。";
         // }
         return result;
     }
@@ -207,22 +207,31 @@ public class ShowController {
     public int progress(int userId, int bookId) {
         return (currentPages(userId, bookId) * 100) / totalPages(bookId);
     }
-
     /*
-     * 最新データ1件削除
+     * progressデータ1件追加
+     */
+    public void addRecentData(int userId, int bookId, int totalPages) {
+        pdao.insertTodayPage(userId, bookId, totalPages);
+    }
+    /*
+     * progressデータ1件削除
      */
     public void deleteRecentData(int userId, int bookId) {
         pdao.delete(userId, bookId);
     }
 
-    public void updateDate(int userId, int bookId) {
-        sumDays(userId, bookId);
-        remainPages(userId, bookId);
-        average(userId, bookId);
-        RecentData(bookId, userId);
-        progress(userId, bookId);
+    /*
+     * BookShelfのTableModelの受け取り
+     */
+    public DefaultTableModel getBookShelfModel(int userId) {
+        return bsdao.createManageBooksList(userId);
     }
-
+    /*
+     * 本の編集をDBに反映
+     */
+    public String editBookData(int originalRow, int column, String editedData) {
+        return bsdao.updateBookData(originalRow, column, editedData);
+    }
     public void changeBook(int userId, int bookId) {
         pdto = pdao.select(userId, bookId);
     }
