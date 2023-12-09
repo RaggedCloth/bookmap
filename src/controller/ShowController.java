@@ -104,8 +104,6 @@ public class ShowController {
         List<String[]> tableData = new ArrayList<>();
         try {
             tableData = pdao.select5RecentData(bookId, userId);
-        } catch (SQLException se) {
-            se.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -223,8 +221,14 @@ public class ShowController {
     /*
      * BookShelfのTableModelの受け取り
      */
-    public DefaultTableModel getBookShelfModel(int userId) {
-        return bsdao.createManageBooksList(userId);
+    public List<String[]> getBookShelfList(int userId) {
+        List<String[]> tableData = new ArrayList<>();
+        try {
+            tableData = bsdao.createManageBooksList(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tableData;
     }
     /*
      * 本の編集をDBに反映

@@ -91,7 +91,7 @@ public class ProgressDAO {
     /*
      * 最新データ5件取得
      */
-    public List<String[]> select5RecentData(int userId, int bookId) throws Exception {
+    public List<String[]> select5RecentData(int userId, int bookId) {
         String sql = "SELECT today_progress AS 'ページ数', created_at AS '日時' " +
                 "FROM (SELECT * FROM bookmap.progress " +
                 "WHERE user_id = ? AND book_id = ? " +

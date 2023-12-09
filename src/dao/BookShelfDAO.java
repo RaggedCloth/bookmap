@@ -19,7 +19,6 @@ public class BookShelfDAO {
     private DefaultTableModel tableModel = new DefaultTableModel();
     private int userId;
     private List<Integer> bookIds = new ArrayList<>();
-    List<String[]> booksData = new ArrayList<>();
 
     public void connect() {
         try {
@@ -40,9 +39,10 @@ public class BookShelfDAO {
         }
     }
 
-    public DefaultTableModel  createManageBooksList(int userId) {
+    public List<String[]>  createManageBooksList(int userId) {
         //tableactionListenerに渡すためにuserIdを受け取る
         this.userId = userId;
+        List<String[]> booksData = new ArrayList<>();
         // データベースからデータを取得
         String selectSQL = "SELECT DISTINCT b.book_id, b.title, a.author_name, g.genre_name, b.total_pages " +
                 "FROM user_books ub " +
@@ -50,15 +50,13 @@ public class BookShelfDAO {
                 "LEFT JOIN authors a ON b.author_id = a.author_id " +
                 "LEFT JOIN genres g ON b.genre_id = g.genre_id " +
                 "WHERE ub.user_id = ?";
-        
-        // BookShelfModelListener modelListener = new BookShelfModelListener();
-        // tableModel.addTableModelListener(modelListener);
-        this.tableModel.addColumn("タイトル");
-        this.tableModel.addColumn("著者");
-        this.tableModel.addColumn("ジャンル");
-        this.tableModel.addColumn("ページ数");
+        // this.tableModel.addColumn("タイトル");
+        // this.tableModel.addColumn("著者");
+        // this.tableModel.addColumn("ジャンル");
+        // this.tableModel.addColumn("ページ数");
         connect();
         try (PreparedStatement ps = con.prepareStatement(selectSQL)) {
+            
             ps.setInt(1, userId);
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -76,23 +74,9 @@ public class BookShelfDAO {
         for (String[] bd : booksData) {
             this.tableModel.addRow(bd);
         }
-        return this.tableModel;
+        return booksData;
     }
 
-    // private class BookShelfModelListener implements TableModelListener {
-    //     @Override
-    //     public void tableChanged(TableModelEvent e) {
-    //         if (e.getType() == TableModelEvent.UPDATE) {
-    //             int row = e.getFirstRow();
-    //             int modelRow = tableModel.convertRowIndexToModel(row);
-    //             int column = e.getColumn();
-    //             DefaultTableModel model = (DefaultTableModel) e.getSource();
-    //             Object newData = model.getValueAt(row, column);
-    //             // データベースに変更を反映するメソッドを呼び出す
-    //             updateBookData(row, column, newData);
-    //         }
-    //     }
-    // }
     public String updateBookData(int originalRow, int column, String editedData) {
         String columnName = this.tableModel.getColumnName(column);
         String updateSQL =  makeSQLStatement(columnName) ;

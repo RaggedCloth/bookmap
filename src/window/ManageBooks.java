@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.List;
+import java.util.ArrayList;
 
 import controller.ShowController;
 
@@ -18,6 +20,7 @@ public class ManageBooks {
     private final DefaultTableModel booksModel;
     private final JScrollPane booksScrollPane;
     private final JTable bookListTable;
+    private final JTable copyOfBookListTable;
     private final JButton addBookButton;
     private final JButton deleteBookButton;
     private final JLabel titleLabel;
@@ -39,6 +42,7 @@ public class ManageBooks {
     LabelTimer labelTimer;
     Timer timer;
     int sec = 0;
+    ShowController showC;
 
     public ManageBooks(int userId) {
         /*
@@ -56,12 +60,26 @@ public class ManageBooks {
         SpringLayout sLayout = new SpringLayout();
         bPanel.setLayout(sLayout);
 
-        ShowController showC = new ShowController();
-
+        showC = new ShowController();
         /*
          * Table
          */
-        booksModel = showC.getBookShelfModel(userId);
+        booksModel = new DefaultTableModel();
+        booksModel.addColumn("タイトル");
+        booksModel.addColumn("著者");
+        booksModel.addColumn("ジャンル");
+        booksModel.addColumn("ページ数");
+        List<String[]> booksData = new ArrayList<>();
+        booksData = showC.getBookShelfList(userId);
+        for (String[] bd : booksData) {
+            booksModel.addRow(bd);
+        }
+        
+        // ModelをTableに入れる
+        bookListTable = new JTable(booksModel);
+        copyOfBookListTable = new JTable(booksModel);   //変更がなければSQLを発行しないようにするためのデータ比較用
+        bookListTable.setAutoCreateRowSorter(true);
+
         labelTimer = new LabelTimer();
         booksModel.addTableModelListener(new TableModelListener() {
             /*
@@ -76,23 +94,19 @@ public class ManageBooks {
                     int column = e.getColumn();
                     DefaultTableModel model = (DefaultTableModel) e.getSource();
                     Object editedDataObject = model.getValueAt(originalRow, column);
-                    if (editedDataObject instanceof String) {
+                    Object oldDataObject = copyOfBookListTable.getValueAt(originalRow, column);
+                    if (editedDataObject instanceof String && !editedDataObject.equals(oldDataObject)) {
                         String editedData = (String) editedDataObject;
                         updatedMessage = showC.editBookData(originalRow, column, editedData);
-                    } else {
-                        System.out.println("不正な値が入力されました。文字列でお願いします。");
+                        updatedMessageLabel.setText(updatedMessage);
+                        updatedMessageLabel.setVisible(true);
+                        timer = new Timer(5000, labelTimer);
+                        timer.start();
                     }
-                    updatedMessageLabel.setText(updatedMessage);
-                    updatedMessageLabel.setVisible(true);
-                    timer = new Timer(5000, labelTimer);
-                    timer.start();
                 }
             }
         });
 
-        // ModelをTableに入れる
-        bookListTable = new JTable(booksModel);
-        bookListTable.setAutoCreateRowSorter(true);
 
         // TableをScrollPaneに入れる
         booksScrollPane = new JScrollPane(bookListTable);
@@ -124,6 +138,7 @@ public class ManageBooks {
                 }
                 String result = showC.addBook(userId, addTitle, addAuthor, addGenre, addTotalPages);
                 System.out.println(result);
+                updateFrame(userId);
             }
         });
         sLayout.putConstraint(SpringLayout.SOUTH, addBookButton, 50, SpringLayout.SOUTH, booksScrollPane);
@@ -221,9 +236,9 @@ public class ManageBooks {
         sLayout.putConstraint(SpringLayout.SOUTH, inputTotalPages, 29, SpringLayout.SOUTH, inputGenre);
         sLayout.putConstraint(SpringLayout.WEST, inputTotalPages, 58, SpringLayout.WEST, totalPagesLabel);
         bPanel.add(inputTotalPages);
-
         getBooksPanel.add(bPanel, BorderLayout.CENTER);
     }
+
     /*
      * 本のTableを編集後、5秒間updatedMessageLabelを表示
      */
@@ -234,7 +249,18 @@ public class ManageBooks {
             updatedMessageLabel.setVisible(false);
         }
     }
+//追加buttonを押した後にJTableの内容を更新
+    public void updateFrame(int userId) {
+        booksModel.setRowCount(0);
+        List<String[]> booksData = new ArrayList<>();
+        booksData = showC.getBookShelfList(userId);
+        for (String[] bd : booksData) {
+            booksModel.addRow(bd);
+        }
+    }
 
+
+    
     public void run() {
         this.manageFrame.setVisible(true);
     }
