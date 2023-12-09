@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
+import com.mysql.cj.x.protobuf.MysqlxPrepare.Prepare;
+
 public class BookShelfDAO {
     private static final String URL = "jdbc:mysql://localhost:3306/bookmap";
     private static final String USER = "devuser01";
@@ -39,8 +41,8 @@ public class BookShelfDAO {
         }
     }
 
-    public List<String[]>  createManageBooksList(int userId) {
-        //tableactionListenerに渡すためにuserIdを受け取る
+    public List<String[]> createManageBooksList(int userId) {
+        // tableactionListenerに渡すためにuserIdを受け取る
         this.userId = userId;
         List<String[]> booksData = new ArrayList<>();
         // データベースからデータを取得
@@ -50,36 +52,57 @@ public class BookShelfDAO {
                 "LEFT JOIN authors a ON b.author_id = a.author_id " +
                 "LEFT JOIN genres g ON b.genre_id = g.genre_id " +
                 "WHERE ub.user_id = ?";
-        // this.tableModel.addColumn("タイトル");
-        // this.tableModel.addColumn("著者");
-        // this.tableModel.addColumn("ジャンル");
-        // this.tableModel.addColumn("ページ数");
         connect();
         try (PreparedStatement ps = con.prepareStatement(selectSQL)) {
-            
             ps.setInt(1, userId);
             rs = ps.executeQuery();
             while (rs.next()) {
-                int bookId = rs.getInt("book_id"); 
-                this.bookIds.add(bookId);            // tableactionListenerで使用するのでbook_idを取得
+                int bookId = rs.getInt("book_id");
+                this.bookIds.add(bookId); // tableactionListenerで使用するのでbook_idを取得
                 String booksTitle = rs.getString("title");
                 String authorName = rs.getString("author_name");
                 String genreName = rs.getString("genre_name");
                 String totalPages = String.valueOf(rs.getInt("total_pages"));
-                booksData.add(new String[] {booksTitle, authorName, genreName, totalPages, String.valueOf(bookId) });
+                booksData.add(new String[] { booksTitle, authorName, genreName, totalPages, String.valueOf(bookId) });
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        for (String[] bd : booksData) {
-            this.tableModel.addRow(bd);
-        }
         return booksData;
+    }
+
+    public void deleteBook(int userId, int bookId) {
+        String childTableSql = "DELETE FROM user_books WHERE user_id = ? AND book_id = ?";
+        String parentTableSql = "DELETE FROM books WHERE book_id = ?";
+        connect();
+        try {
+            con.setAutoCommit(false);
+            try (PreparedStatement ps1 = con.prepareStatement(childTableSql);
+                    PreparedStatement ps2 = con.prepareStatement(parentTableSql)) {
+                ps1.setInt(1, userId);
+                ps1.setInt(2, bookId);
+
+                ps2.setInt(1, bookId);
+
+                ps1.addBatch();
+                ps2.addBatch();
+                ps1.executeBatch();
+                ps2.executeBatch();
+                con.commit();
+            } catch (Exception e) {
+                con.rollback();
+                e.printStackTrace();
+            } finally {
+                con.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public String updateBookData(int originalRow, int column, String editedData) {
         String columnName = this.tableModel.getColumnName(column);
-        String updateSQL =  makeSQLStatement(columnName) ;
+        String updateSQL = makeSQLStatement(columnName);
         int bookId = this.bookIds.get(originalRow);
         connect();
         try (PreparedStatement ps = con.prepareStatement(updateSQL)) {
@@ -103,6 +126,7 @@ public class BookShelfDAO {
         }
         return updatedMessage(columnName);
     }
+
     private String makeSQLStatement(String columnName) {
         switch (columnName) {
             case "タイトル":
@@ -117,6 +141,7 @@ public class BookShelfDAO {
                 return columnName;
         }
     }
+
     private String updatedMessage(String columnName) {
         switch (columnName) {
             case "タイトル":
@@ -131,13 +156,14 @@ public class BookShelfDAO {
                 return columnName;
         }
     }
+
     public int convertToHalfWidthNumber(String editedData) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < editedData.length(); i++) {
             char c = editedData.charAt(i);
             if (0xFF10 <= c && c <= 0xFF19) {
-            // 全角数字の場合、0xFEE0を引いて半角数字に変換
-                sb.append((char)(c - 0xFEE0));
+                // 全角数字の場合、0xFEE0を引いて半角数字に変換
+                sb.append((char) (c - 0xFEE0));
                 // 半角数字の場合、そのまま追加
             } else if ('0' <= c && c <= '9') {
                 sb.append(c);
@@ -145,5 +171,5 @@ public class BookShelfDAO {
         }
         return Integer.parseInt(sb.toString());
     }
-    
+
 }

@@ -114,7 +114,7 @@ public class BooksDAO {
      * 本の管理に登録された1冊の情報を追加する
      * （実装予定）userbooksテーブルを追加し、追加された情報を1件返し、ManageBooksウィンドウのテーブに表示
      */
-    
+
     /*
      * 本棚取得
      * LinkedHashMapに入れるので重複していてもOK
@@ -210,8 +210,8 @@ public class BooksDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            disconnect();
         }
+        disconnect();
+
     }
 }

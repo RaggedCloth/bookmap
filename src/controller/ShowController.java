@@ -217,18 +217,14 @@ public class ShowController {
     public void deleteRecentData(int userId, int bookId) {
         pdao.delete(userId, bookId);
     }
-
+    public void deleteBookByTable(int userId, int bookId) {
+        bsdao.deleteBook(userId, bookId);
+    }
     /*
      * BookShelfのTableModelの受け取り
      */
     public List<String[]> getBookShelfList(int userId) {
-        List<String[]> tableData = new ArrayList<>();
-        try {
-            tableData = bsdao.createManageBooksList(userId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return tableData;
+        return bsdao.createManageBooksList(userId);
     }
     /*
      * 本の編集をDBに反映
