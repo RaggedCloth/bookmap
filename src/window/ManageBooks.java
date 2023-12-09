@@ -4,6 +4,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import javax.swing.event.TableModelListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import controller.ShowController;
+import window.ManageBooks.LabelTimer;
 
 public class ManageBooks {
 
@@ -64,21 +66,33 @@ public class ManageBooks {
         /*
          * Table
          */
+        
+         //modelにカラムを追加しDAOから受け取ったデータを入れる
         booksModel = new DefaultTableModel();
         booksModel.addColumn("タイトル");
         booksModel.addColumn("著者");
         booksModel.addColumn("ジャンル");
         booksModel.addColumn("ページ数");
+        booksModel.addColumn("book_id");
         List<String[]> booksData = new ArrayList<>();
         booksData = showC.getBookShelfList(userId);
         for (String[] bd : booksData) {
             booksModel.addRow(bd);
         }
-        
+
         // ModelをTableに入れる
         bookListTable = new JTable(booksModel);
-        copyOfBookListTable = new JTable(booksModel);   //変更がなければSQLを発行しないようにするためのデータ比較用
+        copyOfBookListTable = new JTable(booksModel); // 変更がなければSQLを発行しないようにするためのデータ比較用
         bookListTable.setAutoCreateRowSorter(true);
+        bookListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+
+        //book_idのカラムは非表示にする
+        TableColumn bookIdColumn = bookListTable.getColumnModel().getColumn(4);
+        bookIdColumn.setMinWidth(0);
+        bookIdColumn.setMaxWidth(0);
+        bookIdColumn.setWidth(0);
+        bookIdColumn.setPreferredWidth(0);
 
         labelTimer = new LabelTimer();
         booksModel.addTableModelListener(new TableModelListener() {
@@ -89,15 +103,22 @@ public class ManageBooks {
             @Override
             public void tableChanged(TableModelEvent e) {
                 if (e.getType() == TableModelEvent.UPDATE) {
+
+                    // 選択されたセルを特定
                     int sortedRow = e.getFirstRow();
                     int originalRow = bookListTable.convertRowIndexToModel(sortedRow);
                     int column = e.getColumn();
-                    DefaultTableModel model = (DefaultTableModel) e.getSource();
-                    Object editedDataObject = model.getValueAt(originalRow, column);
+
+                    // DefaultTableModel model = (DefaultTableModel) e.getSource();
+
+                    // 用意していたモデルの複製と、変更されたモデルの値を比較
+                    Object editedDataObject = booksModel.getValueAt(originalRow, column);
                     Object oldDataObject = copyOfBookListTable.getValueAt(originalRow, column);
                     if (editedDataObject instanceof String && !editedDataObject.equals(oldDataObject)) {
                         String editedData = (String) editedDataObject;
                         updatedMessage = showC.editBookData(originalRow, column, editedData);
+
+                        // updateが完了したメッセージを5秒間表示
                         updatedMessageLabel.setText(updatedMessage);
                         updatedMessageLabel.setVisible(true);
                         timer = new Timer(5000, labelTimer);
@@ -106,7 +127,6 @@ public class ManageBooks {
                 }
             }
         });
-
 
         // TableをScrollPaneに入れる
         booksScrollPane = new JScrollPane(bookListTable);
@@ -150,7 +170,24 @@ public class ManageBooks {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                // 本当に削除しますか？のポップアップ
+                int selectedRow = bookListTable.getSelectedRow();
+                if (selectedRow != -1) {
+
+                    // 選択された行とそのbook_idを特定
+                    int modelRow = bookListTable.convertRowIndexToModel(selectedRow);
+                    int bookId = Integer.parseInt(booksModel.getValueAt(modelRow, 4).toString());
+                    
+                    // 本当に削除しますか？のポップアップ
+                    int userAnswer = JOptionPane.showConfirmDialog(null,
+                            "この本の進捗データは失われます。本当に削除しますか？", "注意", JOptionPane.YES_NO_OPTION,
+                            JOptionPane.WARNING_MESSAGE);
+                    if (userAnswer == JOptionPane.YES_OPTION) {
+                        showC.deleteBookByTable(userId, bookId);
+                        updateFrame(userId);
+                    } else if (userAnswer == JOptionPane.NO_OPTION) {
+                        return;
+                    } 
+                }
             }
         });
         sLayout.putConstraint(SpringLayout.SOUTH, deleteBookButton, 34, SpringLayout.SOUTH, addBookButton);
@@ -249,7 +286,8 @@ public class ManageBooks {
             updatedMessageLabel.setVisible(false);
         }
     }
-//追加buttonを押した後にJTableの内容を更新
+
+    // 追加buttonを押した後にJTableの内容を更新
     public void updateFrame(int userId) {
         booksModel.setRowCount(0);
         List<String[]> booksData = new ArrayList<>();
@@ -259,8 +297,6 @@ public class ManageBooks {
         }
     }
 
-
-    
     public void run() {
         this.manageFrame.setVisible(true);
     }
