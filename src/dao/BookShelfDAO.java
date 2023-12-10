@@ -7,9 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.table.DefaultTableModel;
 
-import com.mysql.cj.x.protobuf.MysqlxPrepare.Prepare;
 
 public class BookShelfDAO {
     private static final String URL = "jdbc:mysql://localhost:3306/bookmap";
@@ -18,8 +16,6 @@ public class BookShelfDAO {
     Connection con = null;
     PreparedStatement ps = null;
     ResultSet rs;
-    private DefaultTableModel tableModel = new DefaultTableModel();
-    private int userId;
     private List<Integer> bookIds = new ArrayList<>();
 
     public void connect() {
@@ -43,7 +39,6 @@ public class BookShelfDAO {
 
     public List<String[]> createManageBooksList(int userId) {
         // tableactionListenerに渡すためにuserIdを受け取る
-        this.userId = userId;
         List<String[]> booksData = new ArrayList<>();
         // データベースからデータを取得
         String selectSQL = "SELECT DISTINCT b.book_id, b.title, a.author_name, g.genre_name, b.total_pages " +
@@ -100,22 +95,25 @@ public class BookShelfDAO {
         }
     }
 
-    public String updateBookData(int originalRow, int column, String editedData) {
-        String columnName = this.tableModel.getColumnName(column);
+    public String updateBookData(int originalRow, String columnName, String editedData) {
         String updateSQL = makeSQLStatement(columnName);
         int bookId = this.bookIds.get(originalRow);
         connect();
         try (PreparedStatement ps = con.prepareStatement(updateSQL)) {
             int totalPages;
+
+            // 半角数字の場合の処理
             if (editedData.matches("\\d+") && columnName.equals("ページ数")) {
-                // 整数の場合の処理
                 totalPages = Integer.parseInt(editedData);
                 ps.setInt(1, totalPages);
+
+            // 全角数字を含む場合の処理
             } else if (editedData.matches("[0-9０-９]+") && columnName.equals("ページ数")) {
                 totalPages = convertToHalfWidthNumber(editedData);
                 ps.setInt(1, totalPages);
+
+            // 文字列の場合の処理
             } else {
-                // 文字列の場合の処理
                 ps.setObject(1, editedData);
             }
             ps.setInt(2, bookId);

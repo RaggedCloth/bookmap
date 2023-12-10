@@ -84,7 +84,6 @@ public class Window extends JFrame {
         /*
          * X == 4
          * X == 5
-         * 
          */
         this.logoButton = new JButton("LOGO");
         logoButton.addActionListener(e -> {
@@ -130,8 +129,6 @@ public class Window extends JFrame {
 
         /*
          * Answer
-         * 
-         * 
          */
         this.sumDaysAnsLabel = new JLabel(showC.sumDays(userId, bookId) + "日");
         sumDaysAnsLabel.setFont(new Font("MS ゴシック", Font.BOLD, 30));
@@ -157,7 +154,6 @@ public class Window extends JFrame {
 
         /*
          * Table
-         * 
          */
         progressModel = new DefaultTableModel();
         progressModel.addColumn("ページ数");
@@ -228,7 +224,6 @@ public class Window extends JFrame {
         panel.add(this.avgText);
 
         /*
-         * 
          * Button--------------------------------------------------
          */
         // 追加機能 バックアップテーブルを準備する
@@ -291,8 +286,6 @@ public class Window extends JFrame {
         /*
          * X == 2
          * X == 3
-         * 
-         * 
          */
         /*
         /*
@@ -305,7 +298,7 @@ public class Window extends JFrame {
         for (String bl : bookList) {
             comboModel.addElement(bl);
         }
-        bookShelfCombo.setSelectedIndex(bookId);
+        bookShelfCombo.setSelectedIndex(-1);
         bookShelfCombo.setPreferredSize(new Dimension(190, 25));
         bookShelfCombo.addActionListener(new ActionListener() {
 
@@ -337,6 +330,7 @@ public class Window extends JFrame {
                     mBooks = new ManageBooks(userId);
                 }
                 mBooks.run();
+                mBooks.updateFrame(userId);
             }
         });
         gbc.anchor = GridBagConstraints.EAST;
