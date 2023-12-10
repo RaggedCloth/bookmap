@@ -12,7 +12,6 @@ import dto.BooksDTO;
 import dto.ProgressDTO;
 import entity.ProgressBean;
 import java.text.SimpleDateFormat;
-import javax.swing.table.DefaultTableModel;
 
 public class ShowController {
     private ProgressDTO pdto;
@@ -229,8 +228,8 @@ public class ShowController {
     /*
      * 本の編集をDBに反映
      */
-    public String editBookData(int originalRow, int column, String editedData) {
-        return bsdao.updateBookData(originalRow, column, editedData);
+    public String editBookData(int originalRow, String columnName, String editedData) {
+        return bsdao.updateBookData(originalRow, columnName, editedData);
     }
     public void changeBook(int userId, int bookId) {
         pdto = pdao.select(userId, bookId);

@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import controller.ShowController;
 import window.ManageBooks.LabelTimer;
@@ -20,6 +21,7 @@ public class ManageBooks {
 
     private final JFrame manageFrame;
     private final DefaultTableModel booksModel;
+    private final DefaultTableModel copyOfBooksModel;
     private final JScrollPane booksScrollPane;
     private final JTable bookListTable;
     private final JTable copyOfBookListTable;
@@ -66,8 +68,8 @@ public class ManageBooks {
         /*
          * Table
          */
-        
-         //modelにカラムを追加しDAOから受け取ったデータを入れる
+
+        // modelにカラムを追加しDAOから受け取ったデータを入れる
         booksModel = new DefaultTableModel();
         booksModel.addColumn("タイトル");
         booksModel.addColumn("著者");
@@ -79,15 +81,28 @@ public class ManageBooks {
         for (String[] bd : booksData) {
             booksModel.addRow(bd);
         }
-
+        copyOfBooksModel = new DefaultTableModel();
+        copyOfBooksModel.addColumn("タイトル");
+        copyOfBooksModel.addColumn("著者");
+        copyOfBooksModel.addColumn("ジャンル");
+        copyOfBooksModel.addColumn("ページ数");
+        copyOfBooksModel.addColumn("book_id");
+        List<String[]> copyOfBooksData = new ArrayList<>();
+        for (String[] bd : booksData) {
+            // 配列を複製して新しいリストに追加
+            String[] copiedArray = Arrays.copyOf(bd, bd.length);
+            copyOfBooksData.add(copiedArray);
+        }
+        for (String[] bd : copyOfBooksData) {
+            copyOfBooksModel.addRow(bd);
+        }
         // ModelをTableに入れる
         bookListTable = new JTable(booksModel);
-        copyOfBookListTable = new JTable(booksModel); // 変更がなければSQLを発行しないようにするためのデータ比較用
+        copyOfBookListTable = new JTable(copyOfBooksModel); // 変更がなければSQLを発行しないようにするためのデータ比較用
         bookListTable.setAutoCreateRowSorter(true);
         bookListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-
-        //book_idのカラムは非表示にする
+        // book_idのカラムは非表示にする
         TableColumn bookIdColumn = bookListTable.getColumnModel().getColumn(4);
         bookIdColumn.setMinWidth(0);
         bookIdColumn.setMaxWidth(0);
@@ -108,15 +123,15 @@ public class ManageBooks {
                     int sortedRow = e.getFirstRow();
                     int originalRow = bookListTable.convertRowIndexToModel(sortedRow);
                     int column = e.getColumn();
-
                     // DefaultTableModel model = (DefaultTableModel) e.getSource();
+                    String columnName = booksModel.getColumnName(column);
 
                     // 用意していたモデルの複製と、変更されたモデルの値を比較
                     Object editedDataObject = booksModel.getValueAt(originalRow, column);
                     Object oldDataObject = copyOfBookListTable.getValueAt(originalRow, column);
                     if (editedDataObject instanceof String && !editedDataObject.equals(oldDataObject)) {
                         String editedData = (String) editedDataObject;
-                        updatedMessage = showC.editBookData(originalRow, column, editedData);
+                        updatedMessage = showC.editBookData(originalRow, columnName, editedData);
 
                         // updateが完了したメッセージを5秒間表示
                         updatedMessageLabel.setText(updatedMessage);
@@ -176,7 +191,7 @@ public class ManageBooks {
                     // 選択された行とそのbook_idを特定
                     int modelRow = bookListTable.convertRowIndexToModel(selectedRow);
                     int bookId = Integer.parseInt(booksModel.getValueAt(modelRow, 4).toString());
-                    
+
                     // 本当に削除しますか？のポップアップ
                     int userAnswer = JOptionPane.showConfirmDialog(null,
                             "この本の進捗データは失われます。本当に削除しますか？", "注意", JOptionPane.YES_NO_OPTION,
@@ -186,7 +201,7 @@ public class ManageBooks {
                         updateFrame(userId);
                     } else if (userAnswer == JOptionPane.NO_OPTION) {
                         return;
-                    } 
+                    }
                 }
             }
         });
