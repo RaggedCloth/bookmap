@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 import controller.ShowController;
 
@@ -27,7 +29,7 @@ public class Window extends JFrame {
     private final JLabel avgPAnsLabel;
     private final JLabel todayPageLabel;
     private final JLabel progressLabel;
-    private final JTable recentData;
+    private final JTable progressDataTable;
     private final JLabel bookTitleLabel;
     private final DefaultTableModel progressModel;
     //private final JScrollPane booksScrollPane;
@@ -158,25 +160,33 @@ public class Window extends JFrame {
         progressModel = new DefaultTableModel();
         progressModel.addColumn("ページ数");
         progressModel.addColumn("日時");
-        recentData = new JTable(progressModel);
+        progressDataTable = new JTable(progressModel);
         List<String[]> tableData = new ArrayList<>();
-        tableData = showC.RecentData(userId, bookId);
+        tableData = showC.progressData(userId, bookId);
         for (String[] row : tableData) {
             progressModel.addRow(row);
         }
+        TableColumn pages = progressDataTable.getColumnModel().getColumn(0);
+        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
+
+        // 各列に右寄せのレンダラーをセット
+        progressDataTable.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
+        progressDataTable.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
+        pages.setPreferredWidth(35);
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.NONE;
         gridValue(4, 5, 1, 1);
         gbc.insets = new Insets(0, 15, 0, 15);
-        gbLayout.setConstraints(recentData, gbc);
-        // JScrollPane scrollPane = new JScrollPane(recentData);
-        // scrollPane.setPreferredSize(new Dimension(150, 103));
+        gbLayout.setConstraints(progressDataTable, gbc);
+        JScrollPane scrollPane = new JScrollPane(progressDataTable);
+        scrollPane.setPreferredSize(new Dimension(150, 160));
         gbc.anchor = GridBagConstraints.NORTH;
-        panel.add(recentData.getTableHeader(), gbc);
-        // panel.add(scrollPane, gbc);
-        panel.add(recentData);
+        //panel.add(progressData.getTableHeader(), gbc);
+        panel.add(scrollPane, gbc);
+        //panel.add(progressData);
 
         /*
          * 削除ボタン
@@ -384,7 +394,7 @@ public class Window extends JFrame {
         avgPAnsLabel.setText(showC.average(userId, bookId) + "P");
         progressModel.setRowCount(0);
         List<String[]> tableData = new ArrayList<>();
-        tableData = showC.RecentData(userId, bookId);
+        tableData = showC.progressData(userId, bookId);
         for (String[] row : tableData) {
             progressModel.addRow(row);
         }

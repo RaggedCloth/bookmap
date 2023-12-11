@@ -3,6 +3,7 @@ package window;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.event.TableModelListener;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import controller.ShowController;
-import window.ManageBooks.LabelTimer;
 
 public class ManageBooks {
 
@@ -101,6 +101,7 @@ public class ManageBooks {
         copyOfBookListTable = new JTable(copyOfBooksModel); // 変更がなければSQLを発行しないようにするためのデータ比較用
         bookListTable.setAutoCreateRowSorter(true);
         bookListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tableSettings(bookListTable);
 
         // book_idのカラムは非表示にする
         TableColumn bookIdColumn = bookListTable.getColumnModel().getColumn(4);
@@ -132,13 +133,8 @@ public class ManageBooks {
                     if (editedDataObject instanceof String && !editedDataObject.equals(oldDataObject)) {
                         String editedData = (String) editedDataObject;
                         updatedMessage = showC.editBookData(originalRow, columnName, editedData);
-
-                        // updateが完了したメッセージを5秒間表示
-                        updatedMessageLabel.setText(updatedMessage);
-                        updatedMessageLabel.setVisible(true);
-                        timer = new Timer(5000, labelTimer);
-                        timer.start();
-                    }
+                        displayUpdatedMessage(updatedMessage);
+                        }
                 }
             }
         });
@@ -163,16 +159,20 @@ public class ManageBooks {
                 addAuthor = inputAuthor.getText();
                 addGenre = inputGenre.getText();
                 String totalPagesText = inputTotalPages.getText();
-                if (!totalPagesText.isEmpty()) {
+                if (numberVaridator(totalPagesText)) {
                     try {
                         addTotalPages = Integer.parseInt(totalPagesText);
                     } catch (NumberFormatException ne) {
                         ne.printStackTrace();
-                        System.out.println("数字を入力してください。");
+                        updatedMessage = "数字を入力してください。";
                     }
+                } else {
+                    updatedMessage = "数字は5桁以内で入力してください。";
                 }
                 String result = showC.addBook(userId, addTitle, addAuthor, addGenre, addTotalPages);
+                displayUpdatedMessage(updatedMessage);
                 System.out.println(result);
+                clearText(bPanel);
                 updateFrame(userId);
             }
         });
@@ -310,6 +310,48 @@ public class ManageBooks {
         for (String[] bd : booksData) {
             booksModel.addRow(bd);
         }
+    }
+
+    public void tableSettings(JTable table) {
+        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        bookListTable.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
+        bookListTable.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+        bookListTable.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+
+        TableColumn title = bookListTable.getColumnModel().getColumn(0);
+        TableColumn author = bookListTable.getColumnModel().getColumn(1);
+        TableColumn genre = bookListTable.getColumnModel().getColumn(2);
+        TableColumn pages = bookListTable.getColumnModel().getColumn(3);
+        title.setPreferredWidth(120);
+        author.setPreferredWidth(60);
+        genre.setPreferredWidth(50);
+        pages.setPreferredWidth(30);
+    }
+
+    public boolean numberVaridator(String totalPagesText) {
+        boolean check = false;
+        if (totalPagesText.matches("[0-9０-９]*") && totalPagesText.length() <= 5) {
+            check = true;
+        }
+        return check;
+    }
+
+    public void clearText(JPanel panel) {
+        for (Component component : panel.getComponents()) {
+            if (component instanceof JTextField) {
+                ((JTextField) component).setText("");
+            }
+        }
+    }
+
+    public void displayUpdatedMessage(String updateMessage) {
+        updatedMessageLabel.setText(updatedMessage);
+        updatedMessageLabel.setVisible(true);
+        timer = new Timer(5000, labelTimer);
+        timer.start();
     }
 
     public void run() {

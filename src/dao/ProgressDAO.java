@@ -2,7 +2,6 @@ package dao;
 
 import java.sql.Timestamp;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -13,20 +12,12 @@ import dto.ProgressDTO;
 import entity.ProgressBean;
 
 public class ProgressDAO {
-    private static final String URL = "jdbc:mysql://localhost:3306/bookmap";
-    private static final String USER = "devuser01";
-    private static final String PASS = "devuser01";
     Connection con = null;
     PreparedStatement ps = null;
     ResultSet rs;
 
     public void connect() {
-        try {
-            // Class.forName("com.mysql.cj.jdbc.Driver");
-            con = DriverManager.getConnection(URL, USER, PASS);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        con = DatabaseSettings.getConnection();
     }
 
     public void disconnect() {
@@ -63,16 +54,17 @@ public class ProgressDAO {
         disconnect();
         return pdto;
     }
+
     /*
      * 本のタイトル名から本のIDを取得
      * （要修正）BookDAOに移動
      */
     public int searchBookId(int userId, String bookTitle) {
         int id = 0;
-        String sql = "SELECT Distinct b.book_id FROM books b " +
-        "LEFT OUTER JOIN user_books ub ON b.book_id = ub.book_id " +
-        "LEFT OUTER JOIN progress p ON ub.user_id = p.user_id " +
-        "WHERE ub.user_id = ? AND b.title = ?";
+        String sql = "SELECT Distinct b.book_id FROM books b "
+                + "LEFT OUTER JOIN user_books ub ON b.book_id = ub.book_id "
+                + "LEFT OUTER JOIN progress p ON ub.user_id = p.user_id "
+                + "WHERE ub.user_id = ? AND b.title = ?";
         connect();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, userId);
@@ -91,12 +83,9 @@ public class ProgressDAO {
     /*
      * 最新データ5件取得
      */
-    public List<String[]> select5RecentData(int userId, int bookId) {
-        String sql = "SELECT today_progress AS 'ページ数', created_at AS '日時' " +
-                "FROM (SELECT * FROM bookmap.progress " +
-                "WHERE user_id = ? AND book_id = ? " +
-                "ORDER BY created_at DESC LIMIT 5) " +
-                "AS latest ORDER BY created_at ASC";
+    public List<String[]> getProgressData(int userId, int bookId) {
+        String sql = "SELECT today_progress, created_at FROM bookmap.progress "
+                + "WHERE user_id = ? AND book_id = ? ORDER BY created_at ASC";
         connect();
         List<String[]> data = new ArrayList<>();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
@@ -104,9 +93,9 @@ public class ProgressDAO {
             ps.setInt(2, bookId);
             rs = ps.executeQuery();
             while (rs.next()) {
-                Timestamp timestampFromProgress = rs.getTimestamp("日時");
+                Timestamp timestampFromProgress = rs.getTimestamp("created_at");
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy MM/dd");
-                String data1 = String.valueOf(rs.getInt("ページ数"));
+                String data1 = String.valueOf(rs.getInt("today_progress")) + "P";
                 String data2 = dateFormat.format(timestampFromProgress);
                 data.add(new String[] { data1, data2 });
             }

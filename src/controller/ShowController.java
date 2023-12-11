@@ -1,6 +1,5 @@
 package controller;
 
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,30 +82,17 @@ public class ShowController {
      * 本棚に本を追加
      */
     public String addBook(int userId, String title, String authorName, String genreName, int totalPages) {
-        // boolean hasBook = false;
         String result;
-        // hasBook = bdao.searchBook(title);
-        // if (!hasBook) {
         bdao.registerBook(userId, title, authorName, genreName, totalPages);
         result = "登録しました。";
-        // } else {
-        // result = "既に登録されている本です。";
-        // }
         return result;
     }
 
     /*
-     * 
-     * 過去5日間のデータ（JTable用）
+     *  JTable for main window
      */
-    public List<String[]> RecentData(int bookId, int userId) {
-        List<String[]> tableData = new ArrayList<>();
-        try {
-            tableData = pdao.select5RecentData(bookId, userId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return tableData;
+    public List<String[]> progressData(int bookId, int userId) {
+            return pdao.getProgressData(bookId, userId);
     }
 
     /*
