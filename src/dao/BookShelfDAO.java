@@ -1,7 +1,6 @@
 package dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,20 +9,13 @@ import java.util.List;
 
 
 public class BookShelfDAO {
-    private static final String URL = "jdbc:mysql://localhost:3306/bookmap";
-    private static final String USER = "devuser01";
-    private static final String PASS = "devuser01";
     Connection con = null;
     PreparedStatement ps = null;
     ResultSet rs;
     private List<Integer> bookIds = new ArrayList<>();
 
     public void connect() {
-        try {
-            con = DriverManager.getConnection(URL, USER, PASS);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        con = DatabaseSettings.getConnection();
     }
 
     public void disconnect() {

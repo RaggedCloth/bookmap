@@ -39,7 +39,7 @@ public class LoginForm {
         loginForm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         loginForm.setBounds(1100, 100, 525, 310);
         loginForm.setResizable(false);
-
+        
         /*
          * JPanel
          */
