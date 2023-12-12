@@ -74,6 +74,24 @@ public class BooksDAO {
         return result;
     }
 
+    public String selectBookTitle(int useId, int bookId) {
+        String result = "";
+        String sql = "SELECT title FROM bookmap.books WHERE book_id = ?";
+        connect();
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, bookId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                BooksBean bb = new BooksBean();
+                bb.setTitle(rs.getString("title"));
+                result = bb.getTitle();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        disconnect();
+        return result;
+    }
     /*
      * BooksテーブルをBeanに入れて返す
      * Jtable用
@@ -204,6 +222,5 @@ public class BooksDAO {
             e.printStackTrace();
         }
         disconnect();
-
     }
 }
