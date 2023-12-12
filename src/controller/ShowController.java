@@ -72,12 +72,17 @@ public class ShowController {
     }
 
     /*
-     * 本のタイトル名から本のIDを取得
+     * 本のタイトルから本のIDを取得
      */
     public int getBookId(int userId, String bookTitle) {
         return pdao.searchBookId(userId, bookTitle);
     }
-
+    /*
+     * 本のIDから本のタイトルを取得
+     */
+    public String getBookTitle(int userId, int bookId) {
+        return bdao.selectBookTitle(userId, bookId);
+    }
     /*
      * 本棚に本を追加
      */
@@ -89,7 +94,7 @@ public class ShowController {
     }
 
     /*
-     *  JTable for main window
+     *  メインウィンドウ内の進捗履歴
      */
     public List<String[]> progressData(int bookId, int userId) {
             return pdao.getProgressData(bookId, userId);

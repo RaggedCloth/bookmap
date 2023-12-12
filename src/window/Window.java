@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,12 +29,12 @@ public class Window extends JFrame {
     private final JLabel rPAnsLabel;
     private final JLabel avgPageLabel;
     private final JLabel avgPAnsLabel;
-    private final JLabel todayPageLabel;
+    private final JLabel todayPagesLabel;
     private final JLabel progressLabel;
     private final JTable progressDataTable;
     private final JLabel bookTitleLabel;
     private final DefaultTableModel progressModel;
-    //private final JScrollPane booksScrollPane;
+    // private final JScrollPane booksScrollPane;
     private final JButton bookListButton;
     private final JButton logoButton;
     private final JButton inputButton;
@@ -41,7 +43,7 @@ public class Window extends JFrame {
     private final JButton previousButton;
     private final JButton nextButton;
     private final JButton deleteButton;
-    private final JTextField avgText;
+    private final JTextField inputTodayPages;
     private final JProgressBar progressBar;
     private final JComboBox<String> bookShelfCombo;
     private final DefaultComboBoxModel<String> comboModel;
@@ -96,9 +98,9 @@ public class Window extends JFrame {
         gbLayout.setConstraints(logoButton, gbc);
         panel.add(this.logoButton);
 
-        this.bookTitleLabel = new JLabel("本のタイトル");
+        this.bookTitleLabel = new JLabel(showC.getBookTitle(userId, bookId));
         bookTitleLabel.setFont(new Font("MS ゴシック", Font.PLAIN, 18));
-        gridValue(4, 0, 2, 1);
+        gridValue(4, 1, 2, 1);
         gbc.insets = new Insets(0, 20, 0, 0);
         gbc.anchor = GridBagConstraints.WEST;
         gbLayout.setConstraints(bookTitleLabel, gbc);
@@ -106,7 +108,7 @@ public class Window extends JFrame {
 
         this.sumDaysLabel = new JLabel("読んだ日数");
         sumDaysLabel.setFont(new Font("MS ゴシック", Font.PLAIN, 18));
-        this.sumDaysLabel.setBackground(Color.green);
+        // this.sumDaysLabel.setBackground(Color.green);
         this.sumDaysLabel.setOpaque(true);
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.WEST;
@@ -173,7 +175,7 @@ public class Window extends JFrame {
         // 各列に右寄せのレンダラーをセット
         progressDataTable.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
         progressDataTable.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
-        pages.setPreferredWidth(35);
+        pages.setPreferredWidth(40);
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.CENTER;
@@ -182,11 +184,11 @@ public class Window extends JFrame {
         gbc.insets = new Insets(0, 15, 0, 15);
         gbLayout.setConstraints(progressDataTable, gbc);
         JScrollPane scrollPane = new JScrollPane(progressDataTable);
-        scrollPane.setPreferredSize(new Dimension(150, 160));
+        scrollPane.setPreferredSize(new Dimension(170, 160));
         gbc.anchor = GridBagConstraints.NORTH;
-        //panel.add(progressData.getTableHeader(), gbc);
+        // panel.add(progressData.getTableHeader(), gbc);
         panel.add(scrollPane, gbc);
-        //panel.add(progressData);
+        // panel.add(progressData);
 
         /*
          * 削除ボタン
@@ -213,47 +215,62 @@ public class Window extends JFrame {
          * Text Field-----------------------------------------------
          */
 
-        this.todayPageLabel = new JLabel("今日のページ数");
-        todayPageLabel.setFont(new Font("MS ゴシック", Font.PLAIN, 16));
+        this.todayPagesLabel = new JLabel("今日のページ数");
+        todayPagesLabel.setFont(new Font("MS ゴシック", Font.PLAIN, 16));
         gbc.anchor = GridBagConstraints.SOUTHEAST;
         gridValue(4, 8, 1, 1);
         gbc.insets = new Insets(25, 10, 12, 0);
         // todayPageLabel.setPreferredSize(new Dimension(200, 50));
-        gbLayout.setConstraints(todayPageLabel, gbc);
-        panel.add(this.todayPageLabel);
+        gbLayout.setConstraints(todayPagesLabel, gbc);
+        panel.add(this.todayPagesLabel);
 
-        this.avgText = new JTextField("");
-        avgText.setFont(new Font("MS ゴシック", Font.PLAIN, 16));
-        this.avgText.setColumns(4);
-        avgText.setHorizontalAlignment(JTextField.CENTER);
+        this.inputTodayPages = new JTextField("");
+        inputTodayPages.setFont(new Font("MS ゴシック", Font.PLAIN, 16));
+        this.inputTodayPages.setColumns(4);
+        inputTodayPages.addKeyListener(new KeyListener() {
+            // キーが半角数字でない場合、入力を無視する
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+                if (!(Character.isDigit(c) || c == KeyEvent.VK_BACK_SPACE || c == KeyEvent.VK_DELETE)) {
+                    e.consume();
+                }
+            }
+            @Override
+            public void keyPressed(KeyEvent e) {
+            }
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
+        });
+        inputTodayPages.setHorizontalAlignment(JTextField.CENTER);
         gbc.anchor = GridBagConstraints.SOUTHWEST;
         gbc.fill = GridBagConstraints.NONE;
         gridValue(5, 8, 1, 1);
         gbc.insets = new Insets(25, 10, 10, 25);
-        gbLayout.setConstraints(avgText, gbc);
-        panel.add(this.avgText);
+        gbLayout.setConstraints(inputTodayPages, gbc);
+        panel.add(this.inputTodayPages);
 
         /*
          * Button--------------------------------------------------
          */
-        // 追加機能 バックアップテーブルを準備する
-        // 過去5日間の読んだページ数を日付とともに表示
         this.inputButton = new JButton("入力");
         inputButton.setPreferredSize(new Dimension(60, 25));
         inputButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (avgText.getText() == null) {
+                if (inputTodayPages.getText() == null) {
                     return;
                 } else {
-                    todayProgress = Integer.valueOf(avgText.getText());
+                    todayProgress = Integer.valueOf(inputTodayPages.getText());
                     showC.addRecentData(userId, bookId, todayProgress);
                 }
                 updateText(userId, bookId);
             }
 
         });
+
         gridValue(5, 8, 1, 1);
         gbc.anchor = GridBagConstraints.SOUTHEAST;
         gbLayout.setConstraints(inputButton, gbc);
@@ -298,7 +315,7 @@ public class Window extends JFrame {
          * X == 3
          */
         /*
-        /*
+         * /*
          * 本のリスト
          * JComboBox
          */
@@ -389,6 +406,7 @@ public class Window extends JFrame {
     }
 
     public void updateText(int userId, int bookId) {
+        bookTitleLabel.setText(showC.getBookTitle(userId, bookId));
         sumDaysAnsLabel.setText(showC.sumDays(userId, bookId) + "日");
         rPAnsLabel.setText(showC.remainPages(userId, bookId) + "P");
         avgPAnsLabel.setText(showC.average(userId, bookId) + "P");

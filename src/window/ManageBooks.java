@@ -50,15 +50,12 @@ public class ManageBooks {
 
     public ManageBooks(int userId) {
         /*
-         * Frame
+         * Frame, Panel
          */
         this.manageFrame = new JFrame();
         manageFrame.setTitle("Books");
         manageFrame.setBounds(900, 200, 500, 350);
 
-        /*
-         * Panel
-         */
         Container getBooksPanel = manageFrame.getContentPane();
         JPanel bPanel = new JPanel();
         SpringLayout sLayout = new SpringLayout();
@@ -71,34 +68,20 @@ public class ManageBooks {
 
         // modelにカラムを追加しDAOから受け取ったデータを入れる
         booksModel = new DefaultTableModel();
-        booksModel.addColumn("タイトル");
-        booksModel.addColumn("著者");
-        booksModel.addColumn("ジャンル");
-        booksModel.addColumn("ページ数");
-        booksModel.addColumn("book_id");
+        copyOfBooksModel = new DefaultTableModel(); // 変更がなければSQLを発行しないようにするためのデータ比較用
+        addColumn(booksModel);
+        addColumn(copyOfBooksModel);
+
         List<String[]> booksData = new ArrayList<>();
         booksData = showC.getBookShelfList(userId);
         for (String[] bd : booksData) {
             booksModel.addRow(bd);
-        }
-        copyOfBooksModel = new DefaultTableModel();
-        copyOfBooksModel.addColumn("タイトル");
-        copyOfBooksModel.addColumn("著者");
-        copyOfBooksModel.addColumn("ジャンル");
-        copyOfBooksModel.addColumn("ページ数");
-        copyOfBooksModel.addColumn("book_id");
-        List<String[]> copyOfBooksData = new ArrayList<>();
-        for (String[] bd : booksData) {
-            // 配列を複製して新しいリストに追加
-            String[] copiedArray = Arrays.copyOf(bd, bd.length);
-            copyOfBooksData.add(copiedArray);
-        }
-        for (String[] bd : copyOfBooksData) {
             copyOfBooksModel.addRow(bd);
         }
+
         // ModelをTableに入れる
         bookListTable = new JTable(booksModel);
-        copyOfBookListTable = new JTable(copyOfBooksModel); // 変更がなければSQLを発行しないようにするためのデータ比較用
+        copyOfBookListTable = new JTable(copyOfBooksModel); 
         bookListTable.setAutoCreateRowSorter(true);
         bookListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableSettings(bookListTable);
@@ -134,7 +117,8 @@ public class ManageBooks {
                         String editedData = (String) editedDataObject;
                         updatedMessage = showC.editBookData(originalRow, columnName, editedData);
                         displayUpdatedMessage(updatedMessage);
-                        }
+                    }
+                    updateFrame(userId);
                 }
             }
         });
@@ -276,11 +260,9 @@ public class ManageBooks {
                     e.consume();
                 }
             }
-
             @Override
             public void keyPressed(KeyEvent e) {
             }
-
             @Override
             public void keyReleased(KeyEvent e) {
             }
@@ -305,10 +287,12 @@ public class ManageBooks {
     // 追加buttonを押した後にJTableの内容を更新
     public void updateFrame(int userId) {
         booksModel.setRowCount(0);
+        copyOfBooksModel.setRowCount(0);
         List<String[]> booksData = new ArrayList<>();
         booksData = showC.getBookShelfList(userId);
         for (String[] bd : booksData) {
             booksModel.addRow(bd);
+            copyOfBooksModel.addRow(bd);
         }
     }
 
@@ -331,6 +315,13 @@ public class ManageBooks {
         pages.setPreferredWidth(30);
     }
 
+    public void addColumn(DefaultTableModel model){
+        model.addColumn("タイトル");
+        model.addColumn("著者");
+        model.addColumn("ジャンル");
+        model.addColumn("ページ数");
+        model.addColumn("book_id");
+    }
     public boolean numberVaridator(String totalPagesText) {
         boolean check = false;
         if (totalPagesText.matches("[0-9０-９]*") && totalPagesText.length() <= 5) {
