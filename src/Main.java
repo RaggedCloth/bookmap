@@ -1,6 +1,6 @@
-import window.LoginForm;
 import javax.swing.SwingUtilities;
 
+import window.Horizontal;
 public class Main {
     public static void main(String[] args) throws Exception {
         SwingUtilities.invokeLater(new Runnable() {
@@ -12,9 +12,13 @@ public class Main {
     }
 
     public static void bookMap() {
-        LoginForm login = new LoginForm();
-        login.run();
+        //LoginForm login = new LoginForm();
+        //login.run();
         // Window window = new Window();
         // window.run();
+//    	layouttest layout = new layouttest();
+//    	layout.run();
+    	Horizontal horizon = new Horizontal();
+    	horizon.run();
     }
 }

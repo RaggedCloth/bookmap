@@ -1,6 +1,5 @@
 package window;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -13,7 +12,16 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -22,18 +30,19 @@ import controller.ShowController;
 
 public class Window extends JFrame {
     private static int todayProgress;
+    private final JLabel bookTitleLabel;
+    private final JLabel sumDaysAnsLabel;
+    private final JLabel rPAnsLabel;
+    private final JLabel avgPAnsLabel;
+    private final DefaultTableModel progressModel;
+    private final ShowController showC;
     private final JFrame frame;
     private final JLabel sumDaysLabel;
-    private final JLabel sumDaysAnsLabel;
     private final JLabel remainPageLabel;
-    private final JLabel rPAnsLabel;
     private final JLabel avgPageLabel;
-    private final JLabel avgPAnsLabel;
     private final JLabel todayPagesLabel;
     private final JLabel progressLabel;
     private final JTable progressDataTable;
-    private final JLabel bookTitleLabel;
-    private final DefaultTableModel progressModel;
     // private final JScrollPane booksScrollPane;
     private final JButton bookListButton;
     private final JButton logoButton;
@@ -47,7 +56,6 @@ public class Window extends JFrame {
     private final JProgressBar progressBar;
     private final JComboBox<String> bookShelfCombo;
     private final DefaultComboBoxModel<String> comboModel;
-    private final ShowController showC;
     private int bookId;
     private List<String> bookList;
     private ManageBooks mBooks;

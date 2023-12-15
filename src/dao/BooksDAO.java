@@ -5,8 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.LinkedHashSet;
+import java.util.List;
+
 import dto.BooksDTO;
 import entity.BooksBean;
 
@@ -182,7 +183,8 @@ public class BooksDAO {
         String books = "INSERT INTO bookmap.books(title, total_pages, author_id, genre_id) " +
                 "VALUES (?, ?, (SELECT author_id FROM bookmap.authors WHERE author_name = ? LIMIT 1), LAST_INSERT_ID())";
         String progress = "INSERT INTO bookmap.user_books(user_id, book_id) " +
-                "VALUES (?, (SELECT book_id FROM bookmap.books WHERE title = ? LIMIT 1))";
+                "VALUES (?, (SELECT book_id FROM bookmap.books WHERE book_id = LAST_INSERT_ID()))";
+                //+ "title = ? LIMIT 1))";
         connect();
         try {
             con.setAutoCommit(false);
@@ -199,7 +201,7 @@ public class BooksDAO {
                 ps3.setString(3, authorName);
 
                 ps4.setInt(1, userId);
-                ps4.setString(2, title);
+                //ps4.setString(2, title);
 
                 ps1.addBatch();
                 ps2.addBatch();
