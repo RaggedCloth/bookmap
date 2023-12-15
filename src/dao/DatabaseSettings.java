@@ -15,6 +15,7 @@ public class DatabaseSettings {
     public static Connection getConnection() {
         try {
             Properties properties = getProperties(mySqlProperties);
+//            Class.forName("com.mysql.cj.jdbc.Driver");
 
             return DriverManager.getConnection(
                     properties.getProperty("URL"),

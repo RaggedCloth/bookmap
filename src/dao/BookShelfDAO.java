@@ -33,7 +33,7 @@ public class BookShelfDAO {
         // tableactionListenerに渡すためにuserIdを受け取る
         List<String[]> booksData = new ArrayList<>();
         // データベースからデータを取得
-        String selectSQL = "SELECT DISTINCT b.book_id, b.title, a.author_name, g.genre_name, b.total_pages " +
+        String selectSQL = "SELECT b.book_id, b.title, a.author_name, g.genre_name, b.total_pages " +
                 "FROM user_books ub " +
                 "JOIN books b ON ub.book_id = b.book_id " +
                 "LEFT JOIN authors a ON b.author_id = a.author_id " +

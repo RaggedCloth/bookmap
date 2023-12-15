@@ -1,19 +1,32 @@
 package window;
 
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.event.TableModelEvent;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.event.TableModelListener;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.SpringLayout;
+import javax.swing.Timer;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 import controller.ShowController;
 
@@ -146,18 +159,18 @@ public class ManageBooks {
                 if (numberVaridator(totalPagesText)) {
                     try {
                         addTotalPages = Integer.parseInt(totalPagesText);
+                        String result = showC.addBook(userId, addTitle, addAuthor, addGenre, addTotalPages);
+                        System.out.println(result);
+                        clearText(bPanel);
                     } catch (NumberFormatException ne) {
                         ne.printStackTrace();
                         updatedMessage = "数字を入力してください。";
                     }
                 } else {
-                    updatedMessage = "数字は5桁以内で入力してください。";
+                    updatedMessage = "ページ数を入力、または5桁以内で入力してください。";
                 }
-                String result = showC.addBook(userId, addTitle, addAuthor, addGenre, addTotalPages);
-                displayUpdatedMessage(updatedMessage);
-                System.out.println(result);
-                clearText(bPanel);
                 updateFrame(userId);
+                displayUpdatedMessage(updatedMessage);
             }
         });
         sLayout.putConstraint(SpringLayout.SOUTH, addBookButton, 50, SpringLayout.SOUTH, booksScrollPane);
@@ -324,7 +337,7 @@ public class ManageBooks {
     }
     public boolean numberVaridator(String totalPagesText) {
         boolean check = false;
-        if (totalPagesText.matches("[0-9０-９]*") && totalPagesText.length() <= 5) {
+        if (totalPagesText.matches("[0-9０-９]*") && totalPagesText.length() <= 5 && !totalPagesText.isEmpty()) {
             check = true;
         }
         return check;
