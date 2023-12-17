@@ -26,6 +26,22 @@ public class UsersDAO {
             e.printStackTrace();
         }
     }
+    public int countloginId(String loginId) {
+        int count = 0;
+        String sql = "SELECT COUNT(*) FROM users WHERE login_id = ?";
+        connect();
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, loginId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+            } catch (Exception e) {
+            e.printStackTrace();
+        }
+        disconnect();
+        return count;
+    }
 
     /*
      * passwordとsaltをudtoに格納

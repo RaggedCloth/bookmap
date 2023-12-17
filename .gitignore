@@ -1,2 +1,7 @@
 *.class
 *.properties
+.VSCodeCounter/
+.settings/
+.vscode/
+.project
+.classpath

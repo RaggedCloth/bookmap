@@ -54,21 +54,21 @@ public class Horizontal extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public Horizontal() {
+	public Horizontal(int userId, int previousBookId) {
 		frame = new JFrame();
 		frame.setTitle("Book MAP");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setBounds(1100, 100, 788, 381);
-		//		
-		//		contentPane = new JPanel();
-		//		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		//		setContentPane(contentPane);
-		//		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
+		//
+		// contentPane = new JPanel();
+		// contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		// setContentPane(contentPane);
+		// contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 		var getP = frame.getContentPane();
 		JPanel panel = new JPanel();
 		panel.setBackground(new Color(48, 48, 48));
-		int userId = 1;
-		bookId = 1;
+
+		bookId = previousBookId;
 		showC = new ShowController(userId, bookId);
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[] { 338, 91, 39, 135, 38, 0 };
@@ -86,7 +86,7 @@ public class Horizontal extends JFrame {
 		bookTitleLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		String title = showC.getBookTitle(userId, bookId);
 		adjustableFontSize(title);
-		//bookTitleLabel.setText(/*showC.getBookTitle(userId, bookId)*/"スッキリJava入門");
+		// bookTitleLabel.setText(/*showC.getBookTitle(userId, bookId)*/"スッキリJava入門");
 		bookTitleLabel.setForeground(new Color(51, 153, 255));
 		GridBagConstraints gbc_bookTitleLabel = new GridBagConstraints();
 		gbc_bookTitleLabel.weighty = 1.0;
@@ -146,8 +146,8 @@ public class Horizontal extends JFrame {
 		gbc_bookShelfCombo.gridy = 0;
 		panel.add(bookShelfCombo, gbc_bookShelfCombo);
 
-		rPAnsLabel = new JLabel(/*showC.currentPages(userId, bookId) +*/"<html><nobr><u>　"
-				+ "400P / " /*+ showC.totalPages(bookId) */ + "600P</u></nobr></html>");
+		rPAnsLabel = new JLabel("<html><nobr><u>　" + showC.currentPages(userId, bookId)
+				+ "P / " + showC.totalPages(bookId) + "P</u></nobr></html>");
 		rPAnsLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		rPAnsLabel.setForeground(new Color(51, 153, 255));
 		rPAnsLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 38));
@@ -192,9 +192,9 @@ public class Horizontal extends JFrame {
 		progressDataTable.setBackground(new Color(48, 48, 48));
 		progressDataTable.setForeground(new Color(51, 153, 255));
 
-        // JScrollPaneの背景色を黒に設定
-        scrollPane.setBackground(new Color(48, 48, 48));
-		
+		// JScrollPaneの背景色を黒に設定
+		scrollPane.setBackground(new Color(48, 48, 48));
+
 		gbc_scrollPane_1.gridwidth = 2;
 		gbc_scrollPane_1.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane_1.weighty = 1.0;
@@ -287,12 +287,12 @@ public class Horizontal extends JFrame {
 
 	public void adjustableFontSize(String title) {
 		bookTitleLabel.setText(title);
-		int variable = title.length()  / 10;
-		if (variable  == 0) {
+		int variable = title.length() / 10;
+		if (variable == 0) {
 			bookTitleLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 30));
 		} else {
-			variable = 30 / variable + 8;
-			bookTitleLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, variable));
+			int fontSize = 20 / variable + 10;
+			bookTitleLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, fontSize));
 		}
 	}
 
@@ -303,7 +303,8 @@ public class Horizontal extends JFrame {
 	public void updateText(int userId, int bookId) {
 		adjustableFontSize(showC.getBookTitle(userId, bookId));
 		sumDaysAnsLabel.setText(showC.sumDays(userId, bookId) + "日");
-		rPAnsLabel.setText(showC.currentPages(userId, bookId) + "P / " + showC.totalPages(bookId) + "P");
+		rPAnsLabel.setText("<html><nobr><u>　" + showC.currentPages(userId, bookId)
+							+ "P / " + showC.totalPages(bookId) + "P</u></nobr></html>");
 		avgPAnsLabel.setText(showC.average(userId, bookId) + "P");
 		progressModel.setRowCount(0);
 		List<String[]> tableData = new ArrayList<>();

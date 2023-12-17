@@ -123,8 +123,15 @@ public class PasswordEncoder {
      * loginIdからuserIdとprogressテーブルで最新データのbookIdを返す
      */
     public int[] getUserData(String loginId) {
+        udao = new UsersDAO();
         return udao.searchIds(loginId);
     }
+    public boolean isUsed(String loginId) {
+        udao = new UsersDAO();
+        boolean isUsed = 0 < udao.countloginId(loginId);
+        return isUsed;
+    }
+
 
     /*
      * *****よく確認してから実装すること*****
