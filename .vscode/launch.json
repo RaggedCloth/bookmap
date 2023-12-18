@@ -9,7 +9,7 @@
             "name": "Main",
             "request": "launch",
             "mainClass": "Main",
-            "projectName": "SwingJava17"
+            "projectName": "bookmap_9ce73f90"
         },
         {
             "type": "java",
@@ -17,26 +17,6 @@
             "request": "launch",
             "mainClass": "Main",
             "projectName": "bookmap"
-        },
-        {
-            "type": "java",
-            "name": "BookShelf",
-            "request": "launch",
-            "mainClass": "window.BookShelf",
-            "projectName": "bookmap_9ce73f90"
-        },
-        {
-            "type": "java",
-            "name": "Current File",
-            "request": "launch",
-            "mainClass": "${file}"
-        },
-        {
-            "type": "java",
-            "name": "Main",
-            "request": "launch",
-            "mainClass": "Main",
-            "projectName": "bookmap_9ce73f90"
         }
     ]
 }

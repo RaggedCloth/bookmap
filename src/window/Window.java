@@ -1,5 +1,6 @@
 package window;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -52,6 +53,7 @@ public class Window extends JFrame {
     private final JButton previousButton;
     private final JButton nextButton;
     private final JButton deleteButton;
+    private final JButton changeUI;
     private final JTextField inputTodayPages;
     private final JProgressBar progressBar;
     private final JComboBox<String> bookShelfCombo;
@@ -244,9 +246,11 @@ public class Window extends JFrame {
                     e.consume();
                 }
             }
+
             @Override
             public void keyPressed(KeyEvent e) {
             }
+
             @Override
             public void keyReleased(KeyEvent e) {
             }
@@ -300,7 +304,7 @@ public class Window extends JFrame {
         gridValue(5, 10, 1, 1);
         gbc.insets = new Insets(10, 15, 5, 15);
         gbLayout.setConstraints(settingsButton, gbc);
-        panel.add(this.settingsButton);
+        // panel.add(this.settingsButton);
 
         this.previousButton = new JButton("前の本");
         previousButton.setPreferredSize(new Dimension(90, 25));
@@ -399,6 +403,27 @@ public class Window extends JFrame {
         gbLayout.setConstraints(progressBar, gbc);
         panel.add(progressBar);
 
+        changeUI = new JButton("UI");
+        changeUI.setForeground(new Color(51, 153, 255));
+        changeUI.setBackground(new Color(48, 48, 48));
+        changeUI.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                stop();
+                TestUI testUI = new TestUI(userId, bookId);
+                testUI.run();
+            }
+
+        });
+        GridBagConstraints gbc_changeUI = new GridBagConstraints();
+        gbc_changeUI.anchor = GridBagConstraints.SOUTHWEST;
+        gbc_changeUI.weighty = 1.0;
+        gbc_changeUI.weightx = 1.0;
+        gbc_changeUI.insets = new Insets(0, 10, 5, 5);
+        gbc_changeUI.gridx = 5;
+        gbc_changeUI.gridy = 10;
+        panel.add(changeUI, gbc_changeUI);
         getP.add(panel);
     }
 
@@ -411,6 +436,10 @@ public class Window extends JFrame {
 
     public void run() {
         this.frame.setVisible(true);
+    }
+
+    public void stop() {
+        this.frame.setVisible(false);
     }
 
     public void updateText(int userId, int bookId) {
