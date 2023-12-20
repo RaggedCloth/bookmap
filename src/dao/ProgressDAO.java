@@ -1,12 +1,12 @@
 package dao;
 
-import java.sql.Timestamp;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.text.SimpleDateFormat;
 
 import dto.ProgressDTO;
 import entity.ProgressBean;
@@ -109,7 +109,7 @@ public class ProgressDAO {
     /*
      * 読んだ合計のページ数
      */
-    public int selectCurrentPages(int userId, int bookId) throws Exception {
+    public int selectCurrentPages(int userId, int bookId) {
         int result = 0;
         String sql = "SELECT today_progress FROM bookmap.progress WHERE user_id = ? AND book_id = ?";
         connect();

@@ -27,6 +27,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import controller.ActionList;
 import controller.ShowController;
 
 public class Window extends JFrame {
@@ -412,6 +413,7 @@ public class Window extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 stop();
                 TestUI testUI = new TestUI(userId, bookId);
+                ActionList actionList = new ActionList(testUI);
                 testUI.run();
             }
 

@@ -1,45 +1,359 @@
 package window;
+
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
-import java.util.ArrayList;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
-import javax.swing.*;
 
-public class TestUI extends BaseItems{
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.table.DefaultTableModel;
 
+import controller.ActionList;
+import controller.Controller;
+import controller.ShowController;
 
-    TestUI(int userId, int previousBookId) {
-        super();
-        super.makeFrame(userId, previousBookId);
-        SpringLayout sl_panel = new SpringLayout();
+public class TestUI  {
+
+	private static final long serialVersionUID = 1L;
+	private JPanel contentPane;
+	private JFrame frame;
+	protected int userId;
+	protected int bookId;
+	private List<String> bookList;
+	public ManageBooks mBooks;
+	private final JButton bookListButton;
+	private final JButton changeUI;
+	private JButton inputButton;
+	private JButton deleteButton;
+	private final JLabel bookTitleLabel;
+	private final JLabel sumDaysAnsLabel;
+	private final JLabel rPAnsLabel;
+	private final JLabel avgPAnsLabel;
+	private final JLabel progressLabel;
+	private final ShowController showC;
+	private JProgressBar progressBar;
+	private JTable progressDataTable = new JTable();
+	private DefaultTableModel progressModel;
+	private JComboBox<Object> bookShelfCombo;
+	DefaultComboBoxModel<Object> comboModel;
+	private JTextField inputTodayPages;
+	private JScrollPane scrollPane;
+	private static int todayProgress;
+	ActionList actionList;
+	Controller controller;
+	/**
+	 * Create the frame.
+	 */
+	public TestUI(int userId, int previousBookId)  {
+		frame = new JFrame();
+		frame.setTitle("Book MAP");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setBounds(1100, 100, 788, 381);
+		//
+		// contentPane = new JPanel();
+		// contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		// setContentPane(contentPane);
+		// contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
+		var getP = frame.getContentPane();
+		JPanel panel = new JPanel();
 		panel.setBackground(new Color(48, 48, 48));
-		panel.setLayout(sl_panel);
-        var getP = frame.getContentPane();
-        getP.add(panel);
+		this.userId = userId;
+		this.bookId = previousBookId;
+		
+		showC = new ShowController(userId, bookId);
+		actionList = new ActionList(this);
+		controller = new Controller();
+		GridBagLayout gbl_panel = new GridBagLayout();
+		gbl_panel.columnWidths = new int[] { 338, 91, 39, 135, 38, 0 };
+		gbl_panel.rowHeights = new int[] { 54, 21, 83, 55, 38, 25, 43 };
+		gbl_panel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 };
+		
+		panel.setLayout(gbl_panel);
 
-        sl_panel.putConstraint(SpringLayout.NORTH, bookTitleLabel, 31, SpringLayout.NORTH, panel);
-		sl_panel.putConstraint(SpringLayout.WEST, bookTitleLabel, 150, SpringLayout.WEST, panel);
-		sl_panel.putConstraint(SpringLayout.SOUTH, bookTitleLabel, -29, SpringLayout.SOUTH, panel);
-		sl_panel.putConstraint(SpringLayout.EAST, bookTitleLabel, -36, SpringLayout.EAST, panel);
+		
+
+		bookTitleLabel = new JLabel();
 		bookTitleLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		bookTitleLabel.setText(/*showC.getBookTitle(userId, bookId)*/"スッキリJava入門");
+		adjustableFontSize(userId, bookId);
 		bookTitleLabel.setForeground(new Color(51, 153, 255));
-		bookTitleLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 30));
-		panel.add(bookTitleLabel);
-        sl_panel.putConstraint(SpringLayout.WEST, changeUI, 250, SpringLayout.WEST, panel);
-        panel.add(changeUI);
+		
+		GridBagConstraints gbc_bookTitleLabel = new GridBagConstraints();
+		gbc_bookTitleLabel.weighty = 1.0;
+		gbc_bookTitleLabel.weightx = 1.0;
+		gbc_bookTitleLabel.fill = GridBagConstraints.HORIZONTAL;
+		gbc_bookTitleLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_bookTitleLabel.gridx = 0;
+		gbc_bookTitleLabel.gridy = 0;
+		panel.add(bookTitleLabel, gbc_bookTitleLabel);
 
-    }
+		bookListButton = new JButton("詳細");
+		bookListButton.setForeground(new Color(51, 153, 255));
+		bookListButton.setBackground(new Color(48, 48, 48));
+		bookListButton.setPreferredSize(new Dimension(65, 25));
+		bookListButton.addActionListener(new ActionListener() {
 
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				actionList.bookListButtonAction(userId);
+			}
+//				if (mBooks == null) {
+//					mBooks = new ManageBooks(userId);
+//				}
+//				mBooks.run();
+//				mBooks.updateFrame(userId);
+//			}
+		});
 
-    @Override
-    void run() {
-        this.frame.setVisible(true);
-    }
+		GridBagConstraints gbc_bookListButton = new GridBagConstraints();
+		gbc_bookListButton.anchor = GridBagConstraints.EAST;
+		gbc_bookListButton.weightx = 1.0;
+		gbc_bookListButton.weighty = 1.0;
+		gbc_bookListButton.insets = new Insets(0, 0, 5, 5);
+		gbc_bookListButton.gridx = 2;
+		gbc_bookListButton.gridy = 0;
+		panel.add(bookListButton, gbc_bookListButton);
 
-    @Override
-    void stop() {
-        this.frame.setVisible(false);
-    }
-    
+		comboModel = controller.setBookList(userId, bookId);
+		bookShelfCombo = new JComboBox<>(comboModel);
+		bookShelfCombo.setForeground(new Color(51, 153, 255));
+		bookShelfCombo.setBackground(new Color(48, 48, 48));
+		bookShelfCombo.setSelectedIndex(-1);
+		bookShelfCombo.setMinimumSize(new Dimension(130, 30));
+		bookShelfCombo.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String bookTitle;
+				bookTitle = String.valueOf(bookShelfCombo.getSelectedItem());
+				bookId = showC.getBookId(userId, bookTitle);
+				updateText(userId, bookId);
+			}
+		});
+		GridBagConstraints gbc_bookShelfCombo = new GridBagConstraints();
+		gbc_bookShelfCombo.fill = GridBagConstraints.HORIZONTAL;
+		gbc_bookShelfCombo.weighty = 1.0;
+		gbc_bookShelfCombo.weightx = 1.0;
+		gbc_bookShelfCombo.insets = new Insets(0, 10, 5, 5);
+		gbc_bookShelfCombo.gridx = 3;
+		gbc_bookShelfCombo.gridy = 0;
+		panel.add(bookShelfCombo, gbc_bookShelfCombo);
+
+		rPAnsLabel = new JLabel(controller.setRemainPageLabel(userId, bookId));
+		rPAnsLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		rPAnsLabel.setForeground(new Color(51, 153, 255));
+		rPAnsLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 38));
+		rPAnsLabel.setBackground(UIManager.getColor("InternalFrame.inactiveBorderColor"));
+		GridBagConstraints gbc_rPAnsLabel = new GridBagConstraints();
+		gbc_rPAnsLabel.weightx = 1.0;
+		gbc_rPAnsLabel.anchor = GridBagConstraints.NORTHEAST;
+		gbc_rPAnsLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_rPAnsLabel.gridx = 0;
+		gbc_rPAnsLabel.gridy = 2;
+		panel.add(rPAnsLabel, gbc_rPAnsLabel);
+
+		
+		getP.add(panel, BorderLayout.CENTER);
+		
+		progressModel = new DefaultTableModel();
+		progressModel.addColumn("ページ数");
+		progressModel.addColumn("日時");
+		progressDataTable = new JTable(progressModel);
+		progressModel = controller.reloadProgressModel(progressModel, userId, bookId);
+		progressDataTable = controller.tableSettings(progressDataTable);
+
+		//progressDataTable = new JTable(progressModel);
+		scrollPane = new JScrollPane(progressDataTable);
+		scrollPane.setPreferredSize(new Dimension(150, 140));
+		GridBagConstraints gbc_scrollPane_1 = new GridBagConstraints();
+		scrollPane.setBackground(new Color(48, 48, 48));
+		gbc_scrollPane_1.gridwidth = 2;
+		gbc_scrollPane_1.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane_1.weighty = 1.0;
+		gbc_scrollPane_1.weightx = 1.0;
+		gbc_scrollPane_1.gridheight = 2;
+		gbc_scrollPane_1.insets = new Insets(0, 10, 5, 5);
+		gbc_scrollPane_1.gridx = 1;
+		gbc_scrollPane_1.gridy = 2;
+		panel.add(scrollPane, gbc_scrollPane_1);
+
+		
+		progressLabel = new JLabel(controller.setProgressLabelString(userId, bookId));
+		progressLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 26));
+		progressLabel.setForeground(new Color(51, 153, 255));
+		GridBagConstraints gbc_progressLabel = new GridBagConstraints();
+		gbc_progressLabel.weighty = 1.0;
+		gbc_progressLabel.weightx = 1.0;
+		gbc_progressLabel.gridheight = 1;
+		gbc_progressLabel.insets = new Insets(0, 10, 5, 5);
+		gbc_progressLabel.gridx = 3;
+		gbc_progressLabel.gridy = 1;
+		panel.add(progressLabel, gbc_progressLabel);
+
+		progressBar = new JProgressBar(JProgressBar.VERTICAL, 0, 100);
+		progressBar.setValue(controller.setProgress(userId, bookId));
+		progressBar.setBackground(new Color(48, 48, 48));
+		progressBar.setForeground(new Color(51, 153, 255));
+		progressBar.setFont(new Font("MS UI Gothic", Font.PLAIN, 36));
+		GridBagConstraints gbc_progressBar = new GridBagConstraints();
+		gbc_progressBar.weighty = 1.0;
+		gbc_progressBar.weightx = 1.0;
+		gbc_progressBar.fill = GridBagConstraints.BOTH;
+		gbc_progressBar.gridheight = 4;
+		gbc_progressBar.insets = new Insets(0, 10, 5, 5);
+		gbc_progressBar.gridx = 3;
+		gbc_progressBar.gridy = 2;
+		panel.add(progressBar, gbc_progressBar);
+
+		avgPAnsLabel = new JLabel(controller.setAvgPagesLabel(userId, bookId));
+		avgPAnsLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		avgPAnsLabel.setForeground(new Color(51, 153, 255));
+		avgPAnsLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 20));
+		GridBagConstraints gbc_avgPAnsLabel = new GridBagConstraints();
+		gbc_avgPAnsLabel.weightx = 1.0;
+		gbc_avgPAnsLabel.fill = GridBagConstraints.HORIZONTAL;
+		gbc_avgPAnsLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_avgPAnsLabel.gridx = 0;
+		gbc_avgPAnsLabel.gridy = 4;
+		panel.add(avgPAnsLabel, gbc_avgPAnsLabel);
+
+		inputTodayPages = new JTextField();
+		inputTodayPages.setForeground(new Color(51, 153, 255));
+		inputTodayPages.setBackground(new Color(48, 48, 48));
+		inputTodayPages.setHorizontalAlignment(SwingConstants.RIGHT);
+		inputTodayPages.setColumns(10);
+		GridBagConstraints gbc_inputTodayPages = new GridBagConstraints();
+		gbc_inputTodayPages.fill = GridBagConstraints.HORIZONTAL;
+		gbc_inputTodayPages.weighty = 1.0;
+		gbc_inputTodayPages.weightx = 1.0;
+		gbc_inputTodayPages.insets = new Insets(0, 10, 5, 5);
+		gbc_inputTodayPages.gridx = 1;
+		gbc_inputTodayPages.gridy = 4;
+		panel.add(inputTodayPages, gbc_inputTodayPages);
+
+		inputButton = new JButton("入力");
+		inputButton.setForeground(new Color(51, 153, 255));
+		inputButton.setBackground(new Color(48, 48, 48));
+		inputButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (inputTodayPages.getText() == null) {
+                    return;
+                } else {
+                    todayProgress = Integer.valueOf(inputTodayPages.getText());
+                    showC.addRecentData(userId, bookId, todayProgress);
+                }
+                updateText(userId, bookId);
+            }
+
+        });
+		GridBagConstraints gbc_inputButton = new GridBagConstraints();
+		gbc_inputButton.anchor = GridBagConstraints.EAST;
+		gbc_inputButton.weighty = 1.0;
+		gbc_inputButton.weightx = 1.0;
+		gbc_inputButton.insets = new Insets(0, 0, 5, 5);
+		gbc_inputButton.gridx = 2;
+		gbc_inputButton.gridy = 4;
+		panel.add(inputButton, gbc_inputButton);
+
+		sumDaysAnsLabel = new JLabel(controller.sumDays(userId, bookId) + "日");
+		sumDaysAnsLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		sumDaysAnsLabel.setForeground(new Color(51, 153, 255));
+		sumDaysAnsLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 20));
+		GridBagConstraints gbc_sumDaysAnsLabel = new GridBagConstraints();
+		gbc_sumDaysAnsLabel.weightx = 1.0;
+		gbc_sumDaysAnsLabel.fill = GridBagConstraints.BOTH;
+		gbc_sumDaysAnsLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_sumDaysAnsLabel.gridx = 0;
+		gbc_sumDaysAnsLabel.gridy = 5;
+		panel.add(sumDaysAnsLabel, gbc_sumDaysAnsLabel);
+
+		deleteButton = new JButton("削除");
+		deleteButton.setBackground(new Color(48, 48, 48));
+		deleteButton.setForeground(new Color(51, 153, 255));
+		deleteButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showC.deleteRecentData(userId, bookId);
+                updateText(userId, bookId);
+            }
+        });
+		GridBagConstraints gbc_deleteButton = new GridBagConstraints();
+		gbc_deleteButton.anchor = GridBagConstraints.EAST;
+		gbc_deleteButton.weighty = 1.0;
+		gbc_deleteButton.weightx = 1.0;
+		gbc_deleteButton.insets = new Insets(0, 0, 5, 5);
+		gbc_deleteButton.gridx = 2;
+		gbc_deleteButton.gridy = 5;
+		panel.add(deleteButton, gbc_deleteButton);
+
+		changeUI = new JButton("UI");
+		changeUI.setForeground(new Color(51, 153, 255));
+		changeUI.setBackground(new Color(48, 48, 48));
+		changeUI.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+				stop();
+                Window window = new Window(userId, bookId);
+				window.run();
+            }
+
+        });
+		GridBagConstraints gbc_changeUI = new GridBagConstraints();
+		gbc_changeUI.anchor = GridBagConstraints.WEST;
+		gbc_changeUI.weighty = 1.0;
+		gbc_changeUI.weightx = 1.0;
+		gbc_changeUI.insets = new Insets(0, 10, 5, 5);
+		gbc_changeUI.gridx = 1;
+		gbc_changeUI.gridy = 5;
+		panel.add(changeUI, gbc_changeUI);
+	}
+
+	public void run() {
+		this.frame.setVisible(true);
+	}
+
+	public void stop() {
+		this.frame.setVisible(false);
+	}
+	public void adjustableFontSize(int userId, int bookId) {
+        String title =  controller.setBookTitle(userId, bookId);
+		bookTitleLabel.setText(title);
+		int variable = title.length() / 10;
+		if (variable == 0) {
+			bookTitleLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 30));
+		} else {
+			int fontSize = 20 / variable + 10;
+			bookTitleLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, fontSize));
+		}
+	}
+
+	public void updateText(int userId, int bookId) {
+		adjustableFontSize(userId, bookId);
+		rPAnsLabel.setText(controller.setRemainPageLabel(userId, bookId));
+		avgPAnsLabel.setText(controller.setAvgPagesLabel(userId, bookId) + "P");
+		sumDaysAnsLabel.setText(controller.sumDays(userId, bookId) + "日");
+		comboModel = controller.setBookList(userId, bookId);
+		progressModel = controller.reloadProgressModel(progressModel, userId,bookId);
+	}
 }
