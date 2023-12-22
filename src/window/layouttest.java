@@ -25,9 +25,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import controller.ActionList;
 import controller.ShowController;
 
-public class layouttest extends JFrame {
+public class layouttest extends Window {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -43,6 +44,7 @@ public class layouttest extends JFrame {
     private final JLabel avgPAnsLabel;
     private final DefaultTableModel progressModel;
     private final ShowController showC;
+    int userId;
 	/**
 	 * Create the frame.
 	 */
@@ -62,11 +64,11 @@ public class layouttest extends JFrame {
 //		contentPane.add(panel);
 		SpringLayout sl_panel = new SpringLayout();
 		panel.setLayout(sl_panel);
-		int userId = 1;
+		this.userId = 1;
 		bookId = 1;
 		showC = new ShowController(userId, bookId);
-		
-		
+		layouttest laytest = this;
+		ActionList actionList = new ActionList(this);
 		
 		bookListButton = new JButton("詳細");
 		sl_panel.putConstraint(SpringLayout.WEST, bookListButton, 250, SpringLayout.WEST, panel);
@@ -76,7 +78,7 @@ public class layouttest extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (mBooks == null) {
-                    mBooks = new ManageBooks(userId);
+                    mBooks = new ManageBooks(userId, laytest);
                 }
                 mBooks.run();
                 mBooks.updateFrame(userId);
@@ -234,4 +236,17 @@ public class layouttest extends JFrame {
             progressModel.addRow(row);
         }
     }
+
+	@Override
+	protected void stop() {
+		// TODO 自動生成されたメソッド・スタブ
+		
+	}
+
+	@Override
+	protected void updateBookShlefCombo() {
+		bookShelfCombo.setModel(controller.setBookList(userId));
+
+		
+	}
 }

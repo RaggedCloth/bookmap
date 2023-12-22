@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -20,9 +21,9 @@ import dto.BooksDTO;
 import dto.ProgressDTO;
 import entity.ProgressBean;
 
-public class Controller {
+public class Controller extends DefaultComboBoxModel<String>  {
 	protected DefaultTableModel progressModel;
-	DefaultComboBoxModel<Object> comboModel;
+	DefaultComboBoxModel<String> comboModel;
     private ProgressDTO pdto;
     private ProgressDAO pdao;
     private ProgressBean pb;
@@ -32,30 +33,40 @@ public class Controller {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy MM/dd");
     private Timestamp timestampFromProgress;
     List<String> bookList;
+    JComboBox<String> bookShelfCombo; 
+    
 	public Controller() {
 	    this.pdao = new ProgressDAO();
 	    this.bdao = new BooksDAO();
 		progressModel = new DefaultTableModel();
 	}
 
-//	abstract protected void run();
-//
-//	abstract protected void stop();
 
+	
 	public String setBookTitle(int userId, int bookId) {
         return bdao.selectBookTitle(userId, bookId);
     }
-	public DefaultComboBoxModel<Object> setBookList(int userId, int bookId) {
+	
+	public DefaultComboBoxModel<String> setBookList(int userId) {
 		comboModel = new DefaultComboBoxModel<>();
-		bookList = new ArrayList<String>();
+		this.bookList = new ArrayList<String>();
+		bookList.removeAll(this.bookList);
 		
-		bookList.removeAll(bookList);
-        bookList = bdao.searchBookList(userId);
-		for (String bl : bookList) {
+        this.bookList = bdao.searchBookList(userId);
+        
+		for (String bl : this.bookList) {
 			comboModel.addElement(bl);
 		}
-		
+		int newIndexStart = 0; // 新しい要素の最初のインデックス
+	    int newIndexEnd = bookList.size() - 1; // 新しい要素の最後のインデックス
+
+	    // fireIntervalAdded を呼び出して変更を通知
+	    fireIntervalAdded(this, newIndexStart, newIndexEnd);
 		return comboModel;
+	}
+	
+	public void setBookShelfCombo(DefaultComboBoxModel<String> comboModel) {
+		 bookShelfCombo.setModel(comboModel);
 	}
 	
 	public String setRemainPageLabel (int userId, int bookId) {
@@ -98,7 +109,13 @@ public class Controller {
      * （例外を防ぐため先に100を掛けて％を出す）
 	 */
 	public int setProgress(int userId, int bookId) {
-		return (pdao.selectCurrentPages(userId, bookId) * 100) / bdao.selectTotalPages(bookId); // 現在の達成率
+		int currentPages = pdao.selectCurrentPages(userId, bookId);
+		int totalPages = bdao.selectTotalPages(bookId);
+		if (totalPages == 0) {
+			return 0;
+		} else {
+			return (currentPages * 100) / totalPages;// 現在の達成率
+		}
 	}
 	public String setProgressLabelString(int userId, int bookId) {
 		return "<html><center><nobr>達成率" + setProgress(userId, bookId) + "％</nobr></center></html>";

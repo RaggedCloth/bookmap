@@ -28,13 +28,15 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import controller.ActionList;
 import controller.ShowController;
 
-public class Horizontal extends JFrame {
+public class Horizontal extends Window {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JFrame frame;
+	int userId;
 	private int bookId;
 	private List<String> bookList;
 	private ManageBooks mBooks;
@@ -53,7 +55,7 @@ public class Horizontal extends JFrame {
 	private JTextField inputTodayPages;
 	private JScrollPane scrollPane;
 	private static int todayProgress;
-
+	private ActionList actionList;
 	/**
 	 * Create the frame.
 	 */
@@ -71,8 +73,12 @@ public class Horizontal extends JFrame {
 		JPanel panel = new JPanel();
 		panel.setBackground(new Color(48, 48, 48));
 
+		this.userId = userId;
 		this.bookId = previousBookId;
 		showC = new ShowController(userId, bookId);
+		Horizontal horizontal = this;
+		actionList = new ActionList(this);
+		
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[] { 338, 91, 39, 135, 38, 0 };
 		gbl_panel.rowHeights = new int[] { 54, 21, 83, 55, 38, 25, 43 };
@@ -111,12 +117,14 @@ public class Horizontal extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (mBooks == null) {
-					mBooks = new ManageBooks(userId);
-				}
-				mBooks.run();
-				mBooks.updateFrame(userId);
+				actionList.bookListButtonAction(userId, horizontal);
 			}
+//				if (mBooks == null) {
+//					mBooks = new ManageBooks(userId);
+//				}
+//				mBooks.run();
+//				mBooks.updateFrame(userId);
+//			}
 		});
 
 		GridBagConstraints gbc_bookListButton = new GridBagConstraints();
@@ -334,8 +342,8 @@ public class Horizontal extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 				stop();
-                Window window = new Window(userId, bookId);
-				window.run();
+                Classic classic = new Classic(userId, bookId);
+				classic.run();
             }
 
         });
@@ -380,5 +388,11 @@ public class Horizontal extends JFrame {
 		for (String[] row : tableData) {
 			progressModel.addRow(row);
 		}
+	}
+
+	@Override
+	protected void updateBookShlefCombo() {
+		bookShelfCombo.setModel(controller.setBookList(userId));
+		
 	}
 }
