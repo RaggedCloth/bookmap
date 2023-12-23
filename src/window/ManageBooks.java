@@ -31,7 +31,7 @@ import javax.swing.table.TableColumn;
 import controller.ShowController;
 
 public class ManageBooks {
-
+	private Window window;
     private final JFrame manageFrame;
     private final DefaultTableModel booksModel;
     private final DefaultTableModel copyOfBooksModel;
@@ -61,10 +61,11 @@ public class ManageBooks {
     int sec = 0;
     ShowController showC;
 
-    public ManageBooks(int userId) {
+    public ManageBooks(int userId, Window window) {
         /*
          * Frame, Panel
          */
+    	this.window = window;
         this.manageFrame = new JFrame();
         manageFrame.setTitle("Books");
         manageFrame.setBounds(900, 200, 500, 350);
@@ -120,7 +121,6 @@ public class ManageBooks {
                     int sortedRow = e.getFirstRow();
                     int originalRow = bookListTable.convertRowIndexToModel(sortedRow);
                     int column = e.getColumn();
-                    // DefaultTableModel model = (DefaultTableModel) e.getSource();
                     String columnName = booksModel.getColumnName(column);
 
                     // 用意していたモデルの複製と、変更されたモデルの値を比較
@@ -162,6 +162,8 @@ public class ManageBooks {
                         String result = showC.addBook(userId, addTitle, addAuthor, addGenre, addTotalPages);
                         System.out.println(result);
                         clearText(bPanel);
+                        window.updateBookShlefCombo();
+                        
                     } catch (NumberFormatException ne) {
                         ne.printStackTrace();
                         updatedMessage = "数字を入力してください。";
@@ -178,6 +180,7 @@ public class ManageBooks {
         bPanel.add(addBookButton);
 
         deleteBookButton = new JButton("削除");
+        sLayout.putConstraint(SpringLayout.EAST, deleteBookButton, 0, SpringLayout.EAST, booksScrollPane);
         deleteBookButton.addActionListener(new ActionListener() {
 
             @Override
@@ -196,14 +199,13 @@ public class ManageBooks {
                     if (userAnswer == JOptionPane.YES_OPTION) {
                         showC.deleteBookByTable(userId, bookId);
                         updateFrame(userId);
+                        window.updateBookShlefCombo();
                     } else if (userAnswer == JOptionPane.NO_OPTION) {
                         return;
                     }
                 }
             }
         });
-        sLayout.putConstraint(SpringLayout.SOUTH, deleteBookButton, 34, SpringLayout.SOUTH, addBookButton);
-        sLayout.putConstraint(SpringLayout.EAST, deleteBookButton, -30, SpringLayout.EAST, bPanel);
         bPanel.add(deleteBookButton);
 
         /*
@@ -215,6 +217,7 @@ public class ManageBooks {
         bPanel.add(titleLabel);
 
         authorLabel = new JLabel("著者");
+        sLayout.putConstraint(SpringLayout.NORTH, deleteBookButton, -4, SpringLayout.NORTH, authorLabel);
         sLayout.putConstraint(SpringLayout.SOUTH, authorLabel, 29, SpringLayout.SOUTH, titleLabel);
         sLayout.putConstraint(SpringLayout.WEST, authorLabel, 30, SpringLayout.WEST, bPanel);
         bPanel.add(authorLabel);
@@ -230,9 +233,9 @@ public class ManageBooks {
         bPanel.add(totalPagesLabel);
 
         errorMessage = "※数字のみ                ";
-        errorMessageLabel = new JLabel(errorMessage);
+        errorMessageLabel = new JLabel("※数字のみ");
         sLayout.putConstraint(SpringLayout.SOUTH, errorMessageLabel, 29, SpringLayout.SOUTH, genreLabel);
-        sLayout.putConstraint(SpringLayout.EAST, errorMessageLabel, -80, SpringLayout.EAST, bPanel);
+        sLayout.putConstraint(SpringLayout.EAST, errorMessageLabel, -133, SpringLayout.EAST, bPanel);
         bPanel.add(errorMessageLabel);
 
         updatedMessageLabel = new JLabel();
@@ -245,6 +248,7 @@ public class ManageBooks {
          * TextField
          */
         inputTitle = new JTextField();
+        titleLabel.setLabelFor(inputTitle);
         inputTitle.setPreferredSize(new Dimension(200, 24));
         sLayout.putConstraint(SpringLayout.SOUTH, inputTitle, 50, SpringLayout.SOUTH, booksScrollPane);
         sLayout.putConstraint(SpringLayout.WEST, inputTitle, 58, SpringLayout.WEST, titleLabel);
@@ -263,6 +267,7 @@ public class ManageBooks {
         bPanel.add(inputGenre);
 
         inputTotalPages = new JTextField();
+        sLayout.putConstraint(SpringLayout.WEST, errorMessageLabel, 6, SpringLayout.EAST, inputTotalPages);
         inputTotalPages.setPreferredSize(new Dimension(200, 24));
         inputTotalPages.addKeyListener(new KeyListener() {
             // キーが半角数字でない場合、入力を無視する
@@ -284,6 +289,12 @@ public class ManageBooks {
         sLayout.putConstraint(SpringLayout.WEST, inputTotalPages, 58, SpringLayout.WEST, totalPagesLabel);
         bPanel.add(inputTotalPages);
         getBooksPanel.add(bPanel, BorderLayout.CENTER);
+        
+        JButton btnNewButton = new JButton("UI");
+        sLayout.putConstraint(SpringLayout.NORTH, btnNewButton, 1, SpringLayout.NORTH, inputTotalPages);
+        sLayout.putConstraint(SpringLayout.WEST, btnNewButton, 0, SpringLayout.WEST, addBookButton);
+        sLayout.putConstraint(SpringLayout.EAST, btnNewButton, 0, SpringLayout.EAST, booksScrollPane);
+        bPanel.add(btnNewButton);
     }
 
     /*

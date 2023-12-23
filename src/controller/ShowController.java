@@ -18,7 +18,7 @@ public class ShowController {
     private ProgressBean pb;
     private BooksDTO bdto;
     private BooksDAO bdao;
-    private BookShelfDAO bsdao = new BookShelfDAO();
+    private BookShelfDAO bsdao;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy MM/dd");
     private Timestamp timestampFromProgress;
 
@@ -208,18 +208,21 @@ public class ShowController {
         pdao.delete(userId, bookId);
     }
     public void deleteBookByTable(int userId, int bookId) {
+        bsdao = new BookShelfDAO();
         bsdao.deleteBook(userId, bookId);
     }
     /*
      * BookShelfのTableModelの受け取り
      */
     public List<String[]> getBookShelfList(int userId) {
+        bsdao = new BookShelfDAO();
         return bsdao.createManageBooksList(userId);
     }
     /*
      * 本の編集をDBに反映
      */
     public String editBookData(int originalRow, String columnName, String editedData) {
+        bsdao = new BookShelfDAO();
         return bsdao.updateBookData(originalRow, columnName, editedData);
     }
     public void changeBook(int userId, int bookId) {

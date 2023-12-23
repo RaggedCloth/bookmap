@@ -9,7 +9,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
@@ -24,22 +23,20 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 
 import controller.ActionList;
+import controller.Controller;
 import controller.ShowController;
 
-public class Horizontal extends Window {
+public class TestUI extends Window {
 
-	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JFrame frame;
-	int userId;
-	private int bookId;
+	protected int userId;
+	protected int bookId;
 	private List<String> bookList;
-	private ManageBooks mBooks;
+	public ManageBooks mBooks;
 	private final JButton bookListButton;
 	private final JButton changeUI;
 	private JButton inputButton;
@@ -49,21 +46,26 @@ public class Horizontal extends Window {
 	private final JLabel rPAnsLabel;
 	private final JLabel avgPAnsLabel;
 	private final JLabel progressLabel;
-	private final DefaultTableModel progressModel;
 	private final ShowController showC;
 	private JProgressBar progressBar;
+	private JTable progressDataTable = new JTable();
+	private DefaultTableModel progressModel;
+	public JComboBox<String> bookShelfCombo;
+	DefaultComboBoxModel<String> comboModel;
 	private JTextField inputTodayPages;
 	private JScrollPane scrollPane;
 	private static int todayProgress;
-	private ActionList actionList;
+	ActionList actionList;
+	Controller controller;
+
 	/**
 	 * Create the frame.
 	 */
-	public Horizontal(int userId, int previousBookId) {
+	public TestUI(int userId, int previousBookId) {
 		frame = new JFrame();
 		frame.setTitle("Book MAP");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setBounds(1100, 100, 788, 381);
+		frame.setBounds(1100, 100, 714, 381);
 		//
 		// contentPane = new JPanel();
 		// contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -72,35 +74,28 @@ public class Horizontal extends Window {
 		var getP = frame.getContentPane();
 		JPanel panel = new JPanel();
 		panel.setBackground(new Color(48, 48, 48));
-
 		this.userId = userId;
 		this.bookId = previousBookId;
-		showC = new ShowController(userId, bookId);
-		Horizontal horizontal = this;
-		actionList = new ActionList(this);
-		
-		GridBagLayout gbl_panel = new GridBagLayout();
-		gbl_panel.columnWidths = new int[] { 338, 91, 39, 135, 38, 0 };
-		gbl_panel.rowHeights = new int[] { 54, 21, 83, 55, 38, 25, 43 };
-		gbl_panel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
-		gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 };
-		
-		panel.setLayout(gbl_panel);
 
-		bookList = showC.getBookList(userId, bookId);
-		DefaultComboBoxModel<Object> comboModel = new DefaultComboBoxModel<>();
-		for (String bl : bookList) {
-			comboModel.addElement(bl);
-		}
+		TestUI testUI = this;
+		showC = new ShowController(userId, bookId);
+		actionList = new ActionList(this);
+		controller = new Controller();
+		GridBagLayout gbl_panel = new GridBagLayout();
+		gbl_panel.columnWidths = new int[] { 70, 261, 96, 84, 147, 19, 0 };
+		gbl_panel.rowHeights = new int[] { 54, 21, 83, 55, 36, 25, 43 };
+		gbl_panel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 };
+
+		panel.setLayout(gbl_panel);
 
 		bookTitleLabel = new JLabel();
 		bookTitleLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		String title = showC.getBookTitle(userId, bookId);
-		adjustableFontSize(title);
-		// bookTitleLabel.setText(/*showC.getBookTitle(userId, bookId)*/"スッキリJava入門");
+		adjustableFontSize(userId, bookId);
 		bookTitleLabel.setForeground(new Color(51, 153, 255));
-		
+
 		GridBagConstraints gbc_bookTitleLabel = new GridBagConstraints();
+		gbc_bookTitleLabel.gridwidth = 2;
 		gbc_bookTitleLabel.weighty = 1.0;
 		gbc_bookTitleLabel.weightx = 1.0;
 		gbc_bookTitleLabel.fill = GridBagConstraints.HORIZONTAL;
@@ -117,14 +112,8 @@ public class Horizontal extends Window {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				actionList.bookListButtonAction(userId, horizontal);
+				actionList.bookListButtonAction(userId, testUI);
 			}
-//				if (mBooks == null) {
-//					mBooks = new ManageBooks(userId);
-//				}
-//				mBooks.run();
-//				mBooks.updateFrame(userId);
-//			}
 		});
 
 		GridBagConstraints gbc_bookListButton = new GridBagConstraints();
@@ -132,11 +121,12 @@ public class Horizontal extends Window {
 		gbc_bookListButton.weightx = 1.0;
 		gbc_bookListButton.weighty = 1.0;
 		gbc_bookListButton.insets = new Insets(0, 0, 5, 5);
-		gbc_bookListButton.gridx = 2;
+		gbc_bookListButton.gridx = 3;
 		gbc_bookListButton.gridy = 0;
 		panel.add(bookListButton, gbc_bookListButton);
 
-		JComboBox<Object> bookShelfCombo = new JComboBox<>(comboModel);
+		comboModel = controller.setBookList(userId);
+		bookShelfCombo = new JComboBox<>(comboModel);
 		bookShelfCombo.setForeground(new Color(51, 153, 255));
 		bookShelfCombo.setBackground(new Color(48, 48, 48));
 		bookShelfCombo.setSelectedIndex(-1);
@@ -145,8 +135,7 @@ public class Horizontal extends Window {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String bookTitle;
-				bookTitle = String.valueOf(bookShelfCombo.getSelectedItem());
+				String bookTitle = String.valueOf(bookShelfCombo.getSelectedItem());
 				bookId = showC.getBookId(userId, bookTitle);
 				updateText(userId, bookId);
 			}
@@ -156,12 +145,33 @@ public class Horizontal extends Window {
 		gbc_bookShelfCombo.weighty = 1.0;
 		gbc_bookShelfCombo.weightx = 1.0;
 		gbc_bookShelfCombo.insets = new Insets(0, 10, 5, 5);
-		gbc_bookShelfCombo.gridx = 3;
+		gbc_bookShelfCombo.gridx = 4;
 		gbc_bookShelfCombo.gridy = 0;
 		panel.add(bookShelfCombo, gbc_bookShelfCombo);
 
-		rPAnsLabel = new JLabel("<html><nobr><u>　" + showC.currentPages(userId, bookId)
-				+ "P / " + showC.totalPages(bookId) + "P</u></nobr></html>");
+		changeUI = new JButton("UI");
+		changeUI.setForeground(new Color(51, 153, 255));
+		changeUI.setBackground(new Color(48, 48, 48));
+		changeUI.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				stop();
+				Classic classic = new Classic(userId, bookId);
+				classic.run();
+			}
+
+		});
+		GridBagConstraints gbc_changeUI = new GridBagConstraints();
+		gbc_changeUI.anchor = GridBagConstraints.EAST;
+		gbc_changeUI.weighty = 1.0;
+		gbc_changeUI.weightx = 1.0;
+		gbc_changeUI.insets = new Insets(0, 10, 5, 5);
+		gbc_changeUI.gridx = 3;
+		gbc_changeUI.gridy = 1;
+		panel.add(changeUI, gbc_changeUI);
+
+		rPAnsLabel = new JLabel(controller.setRemainPageLabel(userId, bookId));
 		rPAnsLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		rPAnsLabel.setForeground(new Color(51, 153, 255));
 		rPAnsLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 38));
@@ -170,58 +180,35 @@ public class Horizontal extends Window {
 		gbc_rPAnsLabel.weightx = 1.0;
 		gbc_rPAnsLabel.anchor = GridBagConstraints.NORTHEAST;
 		gbc_rPAnsLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_rPAnsLabel.gridx = 0;
+		gbc_rPAnsLabel.gridx = 1;
 		gbc_rPAnsLabel.gridy = 2;
 		panel.add(rPAnsLabel, gbc_rPAnsLabel);
+
+		getP.add(panel, BorderLayout.CENTER);
 
 		progressModel = new DefaultTableModel();
 		progressModel.addColumn("ページ数");
 		progressModel.addColumn("日時");
-		List<String[]> tableData = new ArrayList<>();
-		tableData = showC.progressData(userId, bookId);
-		for (String[] row : tableData) {
-			progressModel.addRow(row);
-		}
-		GridBagConstraints gbc_progressDataTable = new GridBagConstraints();
-		gbc_progressDataTable.weighty = 1.0;
-		gbc_progressDataTable.weightx = 1.0;
-		gbc_progressDataTable.fill = GridBagConstraints.NONE;
-		gbc_progressDataTable.weighty = 1.0;
-		gbc_progressDataTable.weighty = 1.0;
-		DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-		rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
+		progressDataTable = new JTable(progressModel);
+		progressModel = controller.reloadProgressModel(progressModel, userId, bookId);
+		progressDataTable = controller.tableSettings(progressDataTable);
 
-		getP.add(panel, BorderLayout.CENTER);
-		JTable progressDataTable = new JTable(progressModel);
-		TableColumn pages = progressDataTable.getColumnModel().getColumn(0);
-		TableColumn days = progressDataTable.getColumnModel().getColumn(1);
-		pages.setPreferredWidth(30);
-		days.setPreferredWidth(60);
-		progressDataTable.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
-		progressDataTable.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
-
+		//progressDataTable = new JTable(progressModel);
 		scrollPane = new JScrollPane(progressDataTable);
 		scrollPane.setPreferredSize(new Dimension(150, 140));
 		GridBagConstraints gbc_scrollPane_1 = new GridBagConstraints();
-		progressDataTable.setBackground(new Color(48, 48, 48));
-		progressDataTable.setForeground(new Color(51, 153, 255));
-
-		// JScrollPaneの背景色を黒に設定
 		scrollPane.setBackground(new Color(48, 48, 48));
-
 		gbc_scrollPane_1.gridwidth = 2;
 		gbc_scrollPane_1.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane_1.weighty = 1.0;
 		gbc_scrollPane_1.weightx = 1.0;
 		gbc_scrollPane_1.gridheight = 2;
 		gbc_scrollPane_1.insets = new Insets(0, 10, 5, 5);
-		gbc_scrollPane_1.gridx = 1;
+		gbc_scrollPane_1.gridx = 2;
 		gbc_scrollPane_1.gridy = 2;
 		panel.add(scrollPane, gbc_scrollPane_1);
 
-		int progress = (showC.progress(userId, bookId)); // 現在の達成率
-		progressLabel = new JLabel();
-        progressLabel.setText("<html><center><nobr>達成率" + progress + "％</nobr></center></html>");
+		progressLabel = new JLabel(controller.setProgressLabelString(userId, bookId));
 		progressLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 26));
 		progressLabel.setForeground(new Color(51, 153, 255));
 		GridBagConstraints gbc_progressLabel = new GridBagConstraints();
@@ -229,15 +216,13 @@ public class Horizontal extends Window {
 		gbc_progressLabel.weightx = 1.0;
 		gbc_progressLabel.gridheight = 1;
 		gbc_progressLabel.insets = new Insets(0, 10, 5, 5);
-		gbc_progressLabel.gridx = 3;
+		gbc_progressLabel.gridx = 4;
 		gbc_progressLabel.gridy = 1;
 		panel.add(progressLabel, gbc_progressLabel);
 
 		progressBar = new JProgressBar(JProgressBar.VERTICAL, 0, 100);
+		progressBar.setValue(controller.setProgress(userId, bookId));
 		progressBar.setBackground(new Color(48, 48, 48));
-		progressBar.setValue(progress);
-		//progressBar.setStringPainted(true);
-		//progressBar.setOrientation(SwingConstants.VERTICAL);
 		progressBar.setForeground(new Color(51, 153, 255));
 		progressBar.setFont(new Font("MS UI Gothic", Font.PLAIN, 36));
 		GridBagConstraints gbc_progressBar = new GridBagConstraints();
@@ -246,11 +231,11 @@ public class Horizontal extends Window {
 		gbc_progressBar.fill = GridBagConstraints.BOTH;
 		gbc_progressBar.gridheight = 4;
 		gbc_progressBar.insets = new Insets(0, 10, 5, 5);
-		gbc_progressBar.gridx = 3;
+		gbc_progressBar.gridx = 4;
 		gbc_progressBar.gridy = 2;
 		panel.add(progressBar, gbc_progressBar);
 
-		avgPAnsLabel = new JLabel(showC.average(userId, bookId) + "P / day");
+		avgPAnsLabel = new JLabel(controller.setAvgPagesLabel(userId, bookId));
 		avgPAnsLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		avgPAnsLabel.setForeground(new Color(51, 153, 255));
 		avgPAnsLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 20));
@@ -258,7 +243,7 @@ public class Horizontal extends Window {
 		gbc_avgPAnsLabel.weightx = 1.0;
 		gbc_avgPAnsLabel.fill = GridBagConstraints.HORIZONTAL;
 		gbc_avgPAnsLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_avgPAnsLabel.gridx = 0;
+		gbc_avgPAnsLabel.gridx = 1;
 		gbc_avgPAnsLabel.gridy = 4;
 		panel.add(avgPAnsLabel, gbc_avgPAnsLabel);
 
@@ -272,7 +257,7 @@ public class Horizontal extends Window {
 		gbc_inputTodayPages.weighty = 1.0;
 		gbc_inputTodayPages.weightx = 1.0;
 		gbc_inputTodayPages.insets = new Insets(0, 10, 5, 5);
-		gbc_inputTodayPages.gridx = 1;
+		gbc_inputTodayPages.gridx = 2;
 		gbc_inputTodayPages.gridy = 4;
 		panel.add(inputTodayPages, gbc_inputTodayPages);
 
@@ -281,28 +266,28 @@ public class Horizontal extends Window {
 		inputButton.setBackground(new Color(48, 48, 48));
 		inputButton.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (inputTodayPages.getText() == null) {
-                    return;
-                } else {
-                    todayProgress = Integer.valueOf(inputTodayPages.getText());
-                    showC.addRecentData(userId, bookId, todayProgress);
-                }
-                updateText(userId, bookId);
-            }
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (inputTodayPages.getText() == null) {
+					return;
+				} else {
+					todayProgress = Integer.valueOf(inputTodayPages.getText());
+					showC.addRecentData(userId, bookId, todayProgress);
+				}
+				updateText(userId, bookId);
+			}
 
-        });
+		});
 		GridBagConstraints gbc_inputButton = new GridBagConstraints();
 		gbc_inputButton.anchor = GridBagConstraints.EAST;
 		gbc_inputButton.weighty = 1.0;
 		gbc_inputButton.weightx = 1.0;
 		gbc_inputButton.insets = new Insets(0, 0, 5, 5);
-		gbc_inputButton.gridx = 2;
+		gbc_inputButton.gridx = 3;
 		gbc_inputButton.gridy = 4;
 		panel.add(inputButton, gbc_inputButton);
 
-		sumDaysAnsLabel = new JLabel(showC.sumDays(userId, bookId) + "日");
+		sumDaysAnsLabel = new JLabel(controller.sumDays(userId, bookId) + "日");
 		sumDaysAnsLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		sumDaysAnsLabel.setForeground(new Color(51, 153, 255));
 		sumDaysAnsLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 20));
@@ -310,7 +295,7 @@ public class Horizontal extends Window {
 		gbc_sumDaysAnsLabel.weightx = 1.0;
 		gbc_sumDaysAnsLabel.fill = GridBagConstraints.BOTH;
 		gbc_sumDaysAnsLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_sumDaysAnsLabel.gridx = 0;
+		gbc_sumDaysAnsLabel.gridx = 1;
 		gbc_sumDaysAnsLabel.gridy = 5;
 		panel.add(sumDaysAnsLabel, gbc_sumDaysAnsLabel);
 
@@ -319,53 +304,20 @@ public class Horizontal extends Window {
 		deleteButton.setForeground(new Color(51, 153, 255));
 		deleteButton.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showC.deleteRecentData(userId, bookId);
-                updateText(userId, bookId);
-            }
-        });
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showC.deleteRecentData(userId, bookId);
+				updateText(userId, bookId);
+			}
+		});
 		GridBagConstraints gbc_deleteButton = new GridBagConstraints();
 		gbc_deleteButton.anchor = GridBagConstraints.EAST;
 		gbc_deleteButton.weighty = 1.0;
 		gbc_deleteButton.weightx = 1.0;
 		gbc_deleteButton.insets = new Insets(0, 0, 5, 5);
-		gbc_deleteButton.gridx = 2;
+		gbc_deleteButton.gridx = 3;
 		gbc_deleteButton.gridy = 5;
 		panel.add(deleteButton, gbc_deleteButton);
-
-		changeUI = new JButton("UI");
-		changeUI.setForeground(new Color(51, 153, 255));
-		changeUI.setBackground(new Color(48, 48, 48));
-		changeUI.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-				stop();
-                Classic classic = new Classic(userId, bookId);
-				classic.run();
-            }
-
-        });
-		GridBagConstraints gbc_changeUI = new GridBagConstraints();
-		gbc_changeUI.anchor = GridBagConstraints.WEST;
-		gbc_changeUI.weighty = 1.0;
-		gbc_changeUI.weightx = 1.0;
-		gbc_changeUI.insets = new Insets(0, 10, 5, 5);
-		gbc_changeUI.gridx = 1;
-		gbc_changeUI.gridy = 5;
-		panel.add(changeUI, gbc_changeUI);
-	}
-
-	public void adjustableFontSize(String title) {
-		bookTitleLabel.setText(title);
-		int variable = title.length() / 10;
-		if (variable == 0) {
-			bookTitleLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 30));
-		} else {
-			int fontSize = 20 / variable + 10;
-			bookTitleLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, fontSize));
-		}
 	}
 
 	public void run() {
@@ -376,23 +328,33 @@ public class Horizontal extends Window {
 		this.frame.setVisible(false);
 	}
 
-	public void updateText(int userId, int bookId) {
-		adjustableFontSize(showC.getBookTitle(userId, bookId));
-		rPAnsLabel.setText("<html><nobr><u>　" + showC.currentPages(userId, bookId)
-						+ "P / " + showC.totalPages(bookId) + "P</u></nobr></html>");
-		avgPAnsLabel.setText(showC.average(userId, bookId) + "P");
-		sumDaysAnsLabel.setText(showC.sumDays(userId, bookId) + "日");
-		progressModel.setRowCount(0);
-		List<String[]> tableData = new ArrayList<>();
-		tableData = showC.progressData(userId, bookId);
-		for (String[] row : tableData) {
-			progressModel.addRow(row);
+	public void adjustableFontSize(int userId, int bookId) {
+		String title = controller.setBookTitle(userId, bookId);
+		bookTitleLabel.setText(title);
+		int variable = title.length() / 10;
+		if (variable == 0) {
+			bookTitleLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 30));
+		} else {
+			int fontSize = 20 / variable + 10;
+			bookTitleLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, fontSize));
 		}
 	}
 
-	@Override
-	protected void updateBookShlefCombo() {
-		bookShelfCombo.setModel(controller.setBookList(userId));
-		
+	public void updateText(int userId, int bookId) {
+		adjustableFontSize(userId, bookId);
+		rPAnsLabel.setText(controller.setRemainPageLabel(userId, bookId));
+		avgPAnsLabel.setText(controller.setAvgPagesLabel(userId, bookId));
+		sumDaysAnsLabel.setText(controller.sumDays(userId, bookId) + "日");
+		progressLabel.setText(controller.setProgressLabelString(userId, bookId));
+		progressModel = controller.reloadProgressModel(progressModel, userId, bookId);
+
+	}
+
+	public void updateBookShlefCombo() {
+		//int beforeIndex = bookShelfCombo.getSelectedIndex();	//選択していたアイテムの要素番号を取得
+		comboModel = controller.setBookList(userId);
+		bookShelfCombo.setModel(comboModel);
+		bookShelfCombo.setSelectedItem(null);
+
 	}
 }

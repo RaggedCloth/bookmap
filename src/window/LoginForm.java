@@ -27,7 +27,7 @@ public class LoginForm {
     private JPanel loginPanel;
     private JButton rootLoginButton;
     private JButton subscribeButton;
-    Window window;
+    Classic classic;
     private int[] userData = new int[2];
     private int userId;
     private int previousBookId;

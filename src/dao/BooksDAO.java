@@ -56,7 +56,7 @@ public class BooksDAO {
     /*
      * 本のtotalPage取得
      */
-    public int selectTotalPages(int bookId) throws Exception {
+    public int selectTotalPages(int bookId) {
         int result = 0;
         String sql = "SELECT total_pages FROM bookmap.books WHERE book_id = ?";
         connect();
@@ -132,7 +132,7 @@ public class BooksDAO {
      */
     public List<String> searchBookList(int userId) {
         List<String> allBookTitle = new ArrayList<>();
-        List<String> bookTitle;
+        List<String> bookTitles;
         String sql = "SELECT b.title FROM bookmap.user_books ub " +
                 "RIGHT OUTER JOIN bookmap.books b ON ub.book_id = b.book_id " +
                 "WHERE ub.user_id = ?";
@@ -146,9 +146,10 @@ public class BooksDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        bookTitle = new ArrayList<>(new LinkedHashSet<>(allBookTitle));
+        bookTitles = new ArrayList<>(new LinkedHashSet<>(allBookTitle));	//重複したタイトルが入る場合プログラムがおかしいのでいらない？
         disconnect();
-        return bookTitle;
+        return bookTitles;
+//        return allBookTitle;
     }
 
     /*
