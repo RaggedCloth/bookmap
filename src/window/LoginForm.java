@@ -3,13 +3,13 @@ package window;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Font;
-import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -105,8 +105,8 @@ public class LoginForm {
                 // Window window = new Window(1,1); //デバッグ用 後で登録ボタンに変更
                 // window.run();
                 loginForm.setVisible(false);
-                Horizontal horizontal = new Horizontal(1, 1);
-                horizontal.run();
+                TestUI testUI = new TestUI(1, 1);
+                testUI.run();
             }
         });
         loginPanel.add(rootLoginButton);
@@ -168,6 +168,7 @@ public class LoginForm {
                 JOptionPane.QUESTION_MESSAGE);
         if (inputPassword == null || inputPassword.isEmpty()) {
             // 何もせずにウィンドウを閉じるだけ
+        	
         } else if (inputPassword.equals(password)) {
             message = "登録されました。";
             passEnc.subscribe(loginIdField.getText(), password);
@@ -183,14 +184,12 @@ public class LoginForm {
         userId = userData[0];
         previousBookId = userData[1];
         loginForm.setVisible(false);
-        Horizontal horizontal = new Horizontal(userId, previousBookId);
-        horizontal.run();
+        TestUI testUI = new TestUI(userId, previousBookId);
+        testUI.run();
     }
 
     public void run() {
         loginForm.setVisible(true);
-        // Window window = new Window();
-        // window.run();
     }
 
 }

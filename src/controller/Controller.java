@@ -70,6 +70,12 @@ public class Controller extends DefaultComboBoxModel<String>  {
 	}
 	
 	public String setRemainPageLabel (int userId, int bookId) {
+		int currentPages = pdao.selectCurrentPages(userId, bookId);
+		int totalPages = bdao.selectTotalPages(bookId);
+		
+		if (currentPages > totalPages) {
+			return  "Finish!!";
+		}
 		return "<html><nobr><u>　" 
 				+ pdao.selectCurrentPages(userId, bookId) + "P / "
 				+ bdao.selectTotalPages(bookId)
@@ -87,7 +93,7 @@ public class Controller extends DefaultComboBoxModel<String>  {
 	}
 	public JTable tableSettings(JTable progressDataTable) {
 		progressDataTable.setBackground(new Color(48, 48, 48));
-		progressDataTable.setForeground(new Color(51, 153, 255));
+		progressDataTable.setForeground(new Color(230, 230, 230));
 		
 		TableColumn pages = progressDataTable.getColumnModel().getColumn(0);
 		TableColumn days = progressDataTable.getColumnModel().getColumn(1);
@@ -111,14 +117,17 @@ public class Controller extends DefaultComboBoxModel<String>  {
 	public int setProgress(int userId, int bookId) {
 		int currentPages = pdao.selectCurrentPages(userId, bookId);
 		int totalPages = bdao.selectTotalPages(bookId);
+		
 		if (totalPages == 0) {
 			return 0;
+		} else if (currentPages > totalPages) {
+			return 100;
 		} else {
 			return (currentPages * 100) / totalPages;// 現在の達成率
 		}
 	}
 	public String setProgressLabelString(int userId, int bookId) {
-		return "<html><center><nobr>達成率" + setProgress(userId, bookId) + "％</nobr></center></html>";
+		return "<html><center><nobr>" + setProgress(userId, bookId) + "％</nobr></center></html>";
 	}
 
 	public int sumDays(int userId, int bookId) {

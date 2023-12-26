@@ -420,7 +420,7 @@ public class Classic extends Window {
             @Override
             public void actionPerformed(ActionEvent e) {
                 stop();
-                TestUI testUI = new TestUI(userId, bookId);
+                Window testUI = new TestUI(userId, bookId);
                 testUI.run();
             }
 
@@ -465,11 +465,6 @@ public class Classic extends Window {
         }
     }
 
-	@Override
-	protected void updateBookShlefCombo() {
-		bookShelfCombo.setModel(controller.setBookList(userId));
-		
-	}
 
 
 }
