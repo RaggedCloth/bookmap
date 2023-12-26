@@ -1,6 +1,7 @@
 package controller;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,6 @@ import dao.ProgressDAO;
 import dto.BooksDTO;
 import dto.ProgressDTO;
 import entity.ProgressBean;
-import java.text.SimpleDateFormat;
 
 public class ShowController {
     private ProgressDTO pdto;
@@ -221,9 +221,9 @@ public class ShowController {
     /*
      * 本の編集をDBに反映
      */
-    public String editBookData(int originalRow, String columnName, String editedData) {
+    public String editBookData(int bookId, String columnName, String editedData) {
         bsdao = new BookShelfDAO();
-        return bsdao.updateBookData(originalRow, columnName, editedData);
+        return bsdao.updateBookData(bookId, columnName, editedData);
     }
     public void changeBook(int userId, int bookId) {
         pdto = pdao.select(userId, bookId);

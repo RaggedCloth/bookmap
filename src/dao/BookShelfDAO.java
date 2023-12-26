@@ -38,7 +38,7 @@ public class BookShelfDAO {
                 "JOIN books b ON ub.book_id = b.book_id " +
                 "LEFT JOIN authors a ON b.author_id = a.author_id " +
                 "LEFT JOIN genres g ON b.genre_id = g.genre_id " +
-                "WHERE ub.user_id = ?";
+                "WHERE ub.user_id = ? ORDER BY ub.book_id";
         connect();
         try (PreparedStatement ps = con.prepareStatement(selectSQL)) {
             ps.setInt(1, userId);
@@ -87,9 +87,8 @@ public class BookShelfDAO {
         }
     }
 
-    public String updateBookData(int originalRow, String columnName, String editedData) {
+    public String updateBookData(int bookId, String columnName, String editedData) {
         String updateSQL = makeSQLStatement(columnName);
-        int bookId = this.bookIds.get(originalRow);
         connect();
         try (PreparedStatement ps = con.prepareStatement(updateSQL)) {
             int totalPages;

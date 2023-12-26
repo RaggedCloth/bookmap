@@ -9,9 +9,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -22,7 +20,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
 import controller.ActionList;
@@ -31,32 +28,7 @@ import controller.ShowController;
 
 public class TestUI extends Window {
 
-	private JPanel contentPane;
-	private JFrame frame;
-	protected int userId;
-	protected int bookId;
-	private List<String> bookList;
-	public ManageBooks mBooks;
-	private final JButton bookListButton;
-	private final JButton changeUI;
-	private JButton inputButton;
-	private JButton deleteButton;
-	private final JLabel bookTitleLabel;
-	private final JLabel sumDaysAnsLabel;
-	private final JLabel rPAnsLabel;
-	private final JLabel avgPAnsLabel;
-	private final JLabel progressLabel;
-	private final ShowController showC;
-	private JProgressBar progressBar;
-	private JTable progressDataTable = new JTable();
-	private DefaultTableModel progressModel;
-	public JComboBox<String> bookShelfCombo;
-	DefaultComboBoxModel<String> comboModel;
-	private JTextField inputTodayPages;
-	private JScrollPane scrollPane;
-	private static int todayProgress;
-	ActionList actionList;
-	Controller controller;
+	protected ShowController showC;
 
 	/**
 	 * Create the frame.
@@ -65,19 +37,15 @@ public class TestUI extends Window {
 		frame = new JFrame();
 		frame.setTitle("Book MAP");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setBounds(1100, 100, 714, 381);
-		//
-		// contentPane = new JPanel();
-		// contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		// setContentPane(contentPane);
-		// contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
+		frame.setBounds(1000, 200, 714, 381);
+
 		var getP = frame.getContentPane();
 		JPanel panel = new JPanel();
-		panel.setBackground(new Color(48, 48, 48));
+		panel.setBackground(new Color(10, 18, 17));
 		this.userId = userId;
 		this.bookId = previousBookId;
 
-		TestUI testUI = this;
+		Window testUI = this;
 		showC = new ShowController(userId, bookId);
 		actionList = new ActionList(this);
 		controller = new Controller();
@@ -92,7 +60,7 @@ public class TestUI extends Window {
 		bookTitleLabel = new JLabel();
 		bookTitleLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		adjustableFontSize(userId, bookId);
-		bookTitleLabel.setForeground(new Color(51, 153, 255));
+		bookTitleLabel.setForeground(new Color(250, 250, 250));
 
 		GridBagConstraints gbc_bookTitleLabel = new GridBagConstraints();
 		gbc_bookTitleLabel.gridwidth = 2;
@@ -105,7 +73,7 @@ public class TestUI extends Window {
 		panel.add(bookTitleLabel, gbc_bookTitleLabel);
 
 		bookListButton = new JButton("詳細");
-		bookListButton.setForeground(new Color(51, 153, 255));
+		bookListButton.setForeground(new Color(250, 250, 250));
 		bookListButton.setBackground(new Color(48, 48, 48));
 		bookListButton.setPreferredSize(new Dimension(65, 25));
 		bookListButton.addActionListener(new ActionListener() {
@@ -127,7 +95,7 @@ public class TestUI extends Window {
 
 		comboModel = controller.setBookList(userId);
 		bookShelfCombo = new JComboBox<>(comboModel);
-		bookShelfCombo.setForeground(new Color(51, 153, 255));
+		bookShelfCombo.setForeground(new Color(250, 250, 250));
 		bookShelfCombo.setBackground(new Color(48, 48, 48));
 		bookShelfCombo.setSelectedIndex(-1);
 		bookShelfCombo.setMinimumSize(new Dimension(130, 30));
@@ -150,7 +118,7 @@ public class TestUI extends Window {
 		panel.add(bookShelfCombo, gbc_bookShelfCombo);
 
 		changeUI = new JButton("UI");
-		changeUI.setForeground(new Color(51, 153, 255));
+		changeUI.setForeground(new Color(250, 250, 250));
 		changeUI.setBackground(new Color(48, 48, 48));
 		changeUI.addActionListener(new ActionListener() {
 
@@ -173,9 +141,8 @@ public class TestUI extends Window {
 
 		rPAnsLabel = new JLabel(controller.setRemainPageLabel(userId, bookId));
 		rPAnsLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		rPAnsLabel.setForeground(new Color(51, 153, 255));
+		rPAnsLabel.setForeground(new Color(250, 250, 250));
 		rPAnsLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 38));
-		rPAnsLabel.setBackground(UIManager.getColor("InternalFrame.inactiveBorderColor"));
 		GridBagConstraints gbc_rPAnsLabel = new GridBagConstraints();
 		gbc_rPAnsLabel.weightx = 1.0;
 		gbc_rPAnsLabel.anchor = GridBagConstraints.NORTHEAST;
@@ -209,21 +176,21 @@ public class TestUI extends Window {
 		panel.add(scrollPane, gbc_scrollPane_1);
 
 		progressLabel = new JLabel(controller.setProgressLabelString(userId, bookId));
-		progressLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 26));
-		progressLabel.setForeground(new Color(51, 153, 255));
+		progressLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 34));
+		progressLabel.setForeground(new Color(48, 48, 48));
 		GridBagConstraints gbc_progressLabel = new GridBagConstraints();
 		gbc_progressLabel.weighty = 1.0;
 		gbc_progressLabel.weightx = 1.0;
 		gbc_progressLabel.gridheight = 1;
 		gbc_progressLabel.insets = new Insets(0, 10, 5, 5);
 		gbc_progressLabel.gridx = 4;
-		gbc_progressLabel.gridy = 1;
+		gbc_progressLabel.gridy = 4;
 		panel.add(progressLabel, gbc_progressLabel);
 
 		progressBar = new JProgressBar(JProgressBar.VERTICAL, 0, 100);
 		progressBar.setValue(controller.setProgress(userId, bookId));
 		progressBar.setBackground(new Color(48, 48, 48));
-		progressBar.setForeground(new Color(51, 153, 255));
+		progressBar.setForeground(new Color(250, 250, 250));
 		progressBar.setFont(new Font("MS UI Gothic", Font.PLAIN, 36));
 		GridBagConstraints gbc_progressBar = new GridBagConstraints();
 		gbc_progressBar.weighty = 1.0;
@@ -237,21 +204,23 @@ public class TestUI extends Window {
 
 		avgPAnsLabel = new JLabel(controller.setAvgPagesLabel(userId, bookId));
 		avgPAnsLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		avgPAnsLabel.setForeground(new Color(51, 153, 255));
+		avgPAnsLabel.setForeground(new Color(250, 250, 250));
 		avgPAnsLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 20));
 		GridBagConstraints gbc_avgPAnsLabel = new GridBagConstraints();
 		gbc_avgPAnsLabel.weightx = 1.0;
 		gbc_avgPAnsLabel.fill = GridBagConstraints.HORIZONTAL;
 		gbc_avgPAnsLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_avgPAnsLabel.gridx = 1;
-		gbc_avgPAnsLabel.gridy = 4;
+		gbc_avgPAnsLabel.gridy = 5;
 		panel.add(avgPAnsLabel, gbc_avgPAnsLabel);
 
 		inputTodayPages = new JTextField();
-		inputTodayPages.setForeground(new Color(51, 153, 255));
+		inputTodayPages.setForeground(new Color(250, 250, 250));
 		inputTodayPages.setBackground(new Color(48, 48, 48));
+		inputTodayPages.setCaretColor(new Color(230, 253, 255));
 		inputTodayPages.setHorizontalAlignment(SwingConstants.RIGHT);
 		inputTodayPages.setColumns(10);
+		allowOnlyNumbers(inputTodayPages);
 		GridBagConstraints gbc_inputTodayPages = new GridBagConstraints();
 		gbc_inputTodayPages.fill = GridBagConstraints.HORIZONTAL;
 		gbc_inputTodayPages.weighty = 1.0;
@@ -262,7 +231,7 @@ public class TestUI extends Window {
 		panel.add(inputTodayPages, gbc_inputTodayPages);
 
 		inputButton = new JButton("入力");
-		inputButton.setForeground(new Color(51, 153, 255));
+		inputButton.setForeground(new Color(250, 250, 250));
 		inputButton.setBackground(new Color(48, 48, 48));
 		inputButton.addActionListener(new ActionListener() {
 
@@ -273,11 +242,15 @@ public class TestUI extends Window {
 				} else {
 					todayProgress = Integer.valueOf(inputTodayPages.getText());
 					showC.addRecentData(userId, bookId, todayProgress);
+					inputTodayPages.setText(null);
 				}
 				updateText(userId, bookId);
 			}
 
 		});
+		
+		ActionListener[] inputButtonEvent = inputButton.getActionListeners(); // inputButtonのActionListenerの配列を入れる
+		inputTodayPages.addActionListener(inputButtonEvent[0]);
 		GridBagConstraints gbc_inputButton = new GridBagConstraints();
 		gbc_inputButton.anchor = GridBagConstraints.EAST;
 		gbc_inputButton.weighty = 1.0;
@@ -287,21 +260,21 @@ public class TestUI extends Window {
 		gbc_inputButton.gridy = 4;
 		panel.add(inputButton, gbc_inputButton);
 
-		sumDaysAnsLabel = new JLabel(controller.sumDays(userId, bookId) + "日");
+		sumDaysAnsLabel = new JLabel("Total Days  " + controller.sumDays(userId, bookId) + "days");
 		sumDaysAnsLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		sumDaysAnsLabel.setForeground(new Color(51, 153, 255));
+		sumDaysAnsLabel.setForeground(new Color(250, 250, 250));
 		sumDaysAnsLabel.setFont(new Font("MS UI Gothic", Font.PLAIN, 20));
 		GridBagConstraints gbc_sumDaysAnsLabel = new GridBagConstraints();
 		gbc_sumDaysAnsLabel.weightx = 1.0;
 		gbc_sumDaysAnsLabel.fill = GridBagConstraints.BOTH;
 		gbc_sumDaysAnsLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_sumDaysAnsLabel.gridx = 1;
-		gbc_sumDaysAnsLabel.gridy = 5;
+		gbc_sumDaysAnsLabel.gridy = 4;
 		panel.add(sumDaysAnsLabel, gbc_sumDaysAnsLabel);
 
 		deleteButton = new JButton("削除");
 		deleteButton.setBackground(new Color(48, 48, 48));
-		deleteButton.setForeground(new Color(51, 153, 255));
+		deleteButton.setForeground(new Color(250, 250, 250));
 		deleteButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -345,16 +318,10 @@ public class TestUI extends Window {
 		rPAnsLabel.setText(controller.setRemainPageLabel(userId, bookId));
 		avgPAnsLabel.setText(controller.setAvgPagesLabel(userId, bookId));
 		sumDaysAnsLabel.setText(controller.sumDays(userId, bookId) + "日");
+		progressBar.setValue(controller.setProgress(userId, bookId));
 		progressLabel.setText(controller.setProgressLabelString(userId, bookId));
 		progressModel = controller.reloadProgressModel(progressModel, userId, bookId);
 
 	}
 
-	public void updateBookShlefCombo() {
-		//int beforeIndex = bookShelfCombo.getSelectedIndex();	//選択していたアイテムの要素番号を取得
-		comboModel = controller.setBookList(userId);
-		bookShelfCombo.setModel(comboModel);
-		bookShelfCombo.setSelectedItem(null);
-
-	}
 }

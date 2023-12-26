@@ -135,7 +135,7 @@ public class BooksDAO {
         List<String> bookTitles;
         String sql = "SELECT b.title FROM bookmap.user_books ub " +
                 "RIGHT OUTER JOIN bookmap.books b ON ub.book_id = b.book_id " +
-                "WHERE ub.user_id = ?";
+                "WHERE ub.user_id = ? ORDER BY ub.book_id";
         connect();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, userId);

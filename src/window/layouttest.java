@@ -243,10 +243,4 @@ public class layouttest extends Window {
 		
 	}
 
-	@Override
-	protected void updateBookShlefCombo() {
-		bookShelfCombo.setModel(controller.setBookList(userId));
-
-		
-	}
 }
