@@ -3,12 +3,14 @@ package controller;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FocusTraversalPolicy;
+import java.awt.Font;
 import java.util.List;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.event.TableModelEvent;
 
-import window.ManageBooks;
+import window.sub.ManageBooks;
 
 public class ManageBooksController  {
 	ManageBooks mBooks;
@@ -75,4 +77,17 @@ public class ManageBooksController  {
 
 		});
 	}
+	
+	public void changeFont(JComponent component, Font font) {
+		       component.setFont(font);
+
+		   if (component instanceof Container) {
+		       for (Component child : ((Container) component).getComponents()) {
+		    	   if (child instanceof JComponent) {
+		    		   changeFont((JComponent) child, font);
+		    	   }
+		       }
+		   }
+		}
+	
 }

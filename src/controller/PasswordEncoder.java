@@ -1,14 +1,18 @@
 package controller;
 
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Font;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+import javax.swing.JComponent;
+
 import dao.UsersDAO;
 import dto.UsersDTO;
-
 import entity.UsersBean;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 
 public class PasswordEncoder {
     private UsersDTO udto;
@@ -162,4 +166,19 @@ public class PasswordEncoder {
         }
         return user;
     }
+    
+    /*
+     * 各Controllerクラスに存在するのでまとめる必要あり
+     */
+	public void changeFont(JComponent component, Font font) {
+	       component.setFont(font);
+
+	   if (component instanceof Container) {
+	       for (Component child : ((Container) component).getComponents()) {
+	    	   if (child instanceof JComponent) {
+	    		   changeFont((JComponent) child, font);
+	    	   }
+	       }
+	   }
+	}
 }

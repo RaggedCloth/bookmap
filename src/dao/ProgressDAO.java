@@ -4,7 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,30 +82,66 @@ public class ProgressDAO {
     }
 
     /*
-     * 最新データ5件取得
+     * 最新データ取得
      */
     public List<String[]> getProgressData(int userId, int bookId) {
-        String sql = "SELECT today_progress, created_at FROM bookmap.progress "
-                + "WHERE user_id = ? AND book_id = ? ORDER BY created_at ASC";
+        String sql = "SELECT progress_id, today_progress, created_at FROM bookmap.progress "
+                + "WHERE user_id = ? AND book_id = ? ORDER BY created_at DESC";
         connect();
-        List<String[]> data = new ArrayList<>();
+        List<String[]> progressData = new ArrayList<>();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, userId);
             ps.setInt(2, bookId);
             rs = ps.executeQuery();
             while (rs.next()) {
-                Timestamp timestampFromProgress = rs.getTimestamp("created_at");
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy MM/dd");
-                String data1 = String.valueOf(rs.getInt("today_progress")) + "P";
-                String data2 = dateFormat.format(timestampFromProgress);
-                data.add(new String[] { data1, data2 });
+                Timestamp createdAt = rs.getTimestamp("created_at");
+                
+                DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy MM/dd");
+                LocalDate date = createdAt.toLocalDateTime().toLocalDate();
+
+                String progressId = String.valueOf(rs.getInt("progress_id"));
+                String progressPages = String.valueOf(rs.getInt("today_progress")) + "P";
+                String formattedDate = date.format(dateFormat);
+                String differenceDate = getDifference(createdAt);
+                progressData.add(new String[] { progressPages, differenceDate, formattedDate, progressId});
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         disconnect();
-        return data;
+        return progressData;
     }
+    
+    public String getDifference(Timestamp createdAt) {
+    	LocalDate today = LocalDate.now();
+    	
+    	//timestamp型をLocalDateTime型にし、さらにそれをLocalDate型に変換
+        LocalDate pastDate = createdAt.toLocalDateTime().toLocalDate();
+        
+        int diffDays = today.getDayOfYear() - pastDate.getDayOfYear();
+        
+        if (diffDays == 0) {
+        	return String.format("今日");
+        	
+        } else if (diffDays == 1){
+        	return String.format("昨日");
+        	
+        } else if (diffDays == 2){
+        	return String.format("一昨日");
+        	
+        } else if (diffDays <= 6) {
+            return  String.format("%d日前", diffDays);
+            
+        } else if (diffDays <= 30) {
+            return String.format("%d週間前", diffDays / 7);
+            
+        } else if (diffDays <= 365) {
+            return String.format("%dか月前", diffDays / 30);
+            
+        } else {
+            return String.format("%d年前", diffDays / 365);
+        }
+     }
 
     /*
      * 読んだ合計のページ数
@@ -149,12 +186,12 @@ public class ProgressDAO {
     /*
      * 最新データ1件削除
      */
-    public void delete(int userId, int bookId) {
-        String sql = "DELETE FROM bookmap.progress WHERE user_id = ? AND book_id = ? ORDER by progress_id DESC LIMIT 1";
+    public void delete(int userId, int progressId) {
+        String sql = "DELETE FROM bookmap.progress WHERE user_id = ? AND progress_id = ? ORDER by progress_id DESC LIMIT 1";
         connect();
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, userId);
-            ps.setInt(2, bookId);
+            ps.setInt(2, progressId);
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,4 +1,4 @@
-package window;
+package window.login;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -15,6 +15,8 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import controller.PasswordEncoder;
+import window.main.Classic;
+import window.main.TestUI;
 
 public class LoginForm {
     private final JFrame loginForm;
@@ -48,6 +50,7 @@ public class LoginForm {
          */
         Container getP = loginForm.getContentPane();
         loginPanel = new JPanel();
+        loginPanel.setBackground(new Color(250, 250, 250));
         loginPanel.setLayout(null);
 
         /*
@@ -55,18 +58,18 @@ public class LoginForm {
          */
         userName = new JLabel("LOGIN ID");
         userName.setForeground(Color.BLACK);
-        userName.setFont(new Font("Tahoma", Font.PLAIN, 20));
+        userName.setFont(new Font("メイリオ", Font.PLAIN, 20));
         userName.setBounds(80, 66, 193, 52);
         loginPanel.add(userName);
 
         password = new JLabel("PASSWORD");
         password.setForeground(Color.BLACK);
-        password.setFont(new Font("Tahoma", Font.PLAIN, 20));
+        password.setFont(new Font("メイリオ", Font.PLAIN, 20));
         password.setBounds(80, 120, 193, 52);
         loginPanel.add(password);
 
         messageLabel = new JLabel("welcome to Bookmap");
-        messageLabel.setFont(new Font("Meirio UI", Font.PLAIN, 13));
+        messageLabel.setFont(new Font("メイリオ", Font.PLAIN, 13));
         messageLabel.setBounds(0, 230, 500, 52);
         messageLabel.setHorizontalAlignment(JLabel.CENTER);
         loginPanel.add(messageLabel);
@@ -75,7 +78,9 @@ public class LoginForm {
          * JButton
          */
         subscribeButton = new JButton("Sign up");
-        subscribeButton.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        subscribeButton.setFont(new Font("メイリオ", Font.PLAIN, 12));
+        subscribeButton.setForeground(new Color(40, 40, 40));
+        subscribeButton.setBackground(new Color(225, 238, 251));
         subscribeButton.setBounds(299, 180, 80, 30);
         subscribeButton.addActionListener(new ActionListener() {
 
@@ -97,7 +102,9 @@ public class LoginForm {
         loginPanel.add(subscribeButton);
 
         rootLoginButton = new JButton("root");
-        rootLoginButton.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        rootLoginButton.setFont(new Font("メイリオ", Font.PLAIN, 12));
+        rootLoginButton.setForeground(new Color(40, 40, 40));
+        rootLoginButton.setBackground(new Color(225, 238, 251));
         rootLoginButton.setBounds(415, 230, 85, 30);
         rootLoginButton.addActionListener(new ActionListener() {
 
@@ -112,7 +119,9 @@ public class LoginForm {
         loginPanel.add(rootLoginButton);
 
         loginButton = new JButton("Login");
-        loginButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+        loginButton.setFont(new Font("メイリオ", Font.BOLD, 12));
+        loginButton.setForeground(new Color(40, 40, 40));
+        loginButton.setBackground(new Color(225, 238, 251));
         loginButton.setBounds(200, 180, 80, 30);
         loginButton.addActionListener(new ActionListener() {
 
@@ -143,6 +152,9 @@ public class LoginForm {
         loginPanel.add(loginButton);
         getP.add(loginPanel);
 
+        
+//        Font allFont = new Font("メイリオ", Font.PLAIN, 12);
+//        passEnc.changeFont(loginPanel, allFont);
         /*
          * JTextField
          */
@@ -157,7 +169,7 @@ public class LoginForm {
         passwordField.setFont(new Font("Tahoma", Font.PLAIN, 21));
         passwordField.setBounds(200, 127, 180, 35);
         loginPanel.add(passwordField);
-
+        
     }
 
     public String verifyPassword() {

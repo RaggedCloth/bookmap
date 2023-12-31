@@ -1,4 +1,4 @@
-package window;
+package window.main;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -29,6 +29,8 @@ import javax.swing.table.TableColumn;
 
 import controller.ActionList;
 import controller.ShowController;
+import window.Window;
+import window.sub.ManageBooks;
 
 public class Classic extends Window {
     private static int todayProgress;
