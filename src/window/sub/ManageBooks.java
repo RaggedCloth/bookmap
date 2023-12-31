@@ -1,9 +1,11 @@
-package window;
+package window.sub;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -30,6 +32,7 @@ import javax.swing.table.TableColumn;
 
 import controller.ManageBooksController;
 import controller.ShowController;
+import window.Window;
 
 public class ManageBooks {
 	private Window window;
@@ -76,6 +79,7 @@ public class ManageBooks {
 		JPanel bPanel = new JPanel();
 		SpringLayout sLayout = new SpringLayout();
 		bPanel.setLayout(sLayout);
+		bPanel.setBackground(new Color(250, 250, 250));
 
 		showC = new ShowController();
 		mbController = new ManageBooksController(this);
@@ -99,16 +103,7 @@ public class ManageBooks {
 		// ModelをTableに入れる
 		bookListTable = new JTable(booksModel);
 		//copyOfBookListTable = new JTable(copyOfBooksModel);
-		bookListTable.setAutoCreateRowSorter(true);
-		bookListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableSettings(bookListTable);
-
-		// book_idのカラムは非表示にする
-		TableColumn bookIdColumn = bookListTable.getColumnModel().getColumn(4);
-		bookIdColumn.setMinWidth(0);
-		bookIdColumn.setMaxWidth(0);
-		bookIdColumn.setWidth(0);
-		bookIdColumn.setPreferredWidth(0);
 
 		labelTimer = new LabelTimer();
 		booksModel.addTableModelListener(new TableModelListener() {
@@ -165,12 +160,9 @@ public class ManageBooks {
 				displayUpdatedMessage(updatedMessage);
 			}
 		});
-		sLayout.putConstraint(SpringLayout.SOUTH, addBookButton, 50, SpringLayout.SOUTH, booksScrollPane);
-		sLayout.putConstraint(SpringLayout.EAST, addBookButton, -30, SpringLayout.EAST, bPanel);
 		bPanel.add(addBookButton);
 
 		deleteBookButton = new JButton("削除");
-		sLayout.putConstraint(SpringLayout.EAST, deleteBookButton, 0, SpringLayout.EAST, booksScrollPane);
 		deleteBookButton.addActionListener(new ActionListener() {
 
 			@Override
@@ -181,10 +173,11 @@ public class ManageBooks {
 					// 選択された行とそのbook_idを特定
 					int modelRow = bookListTable.convertRowIndexToModel(selectedRow);
 					int bookId = Integer.parseInt(booksModel.getValueAt(modelRow, 4).toString());
+					String bookTitle = booksModel.getValueAt(modelRow, 0).toString();
 
 					// 本当に削除しますか？のポップアップ
 					int userAnswer = JOptionPane.showConfirmDialog(null,
-							"この本の進捗データは失われます。本当に削除しますか？", "注意", JOptionPane.YES_NO_OPTION,
+							"「 " + bookTitle + " 」の進捗データは失われます。本当に削除しますか？", "注意", JOptionPane.YES_NO_OPTION,
 							JOptionPane.WARNING_MESSAGE);
 					if (userAnswer == JOptionPane.YES_OPTION) {
 						showC.deleteBookByTable(userId, bookId);
@@ -207,8 +200,8 @@ public class ManageBooks {
 		bPanel.add(titleLabel);
 
 		authorLabel = new JLabel("著者");
-		sLayout.putConstraint(SpringLayout.NORTH, deleteBookButton, -4, SpringLayout.NORTH, authorLabel);
-		sLayout.putConstraint(SpringLayout.SOUTH, authorLabel, 29, SpringLayout.SOUTH, titleLabel);
+		sLayout.putConstraint(SpringLayout.NORTH, deleteBookButton, 7, SpringLayout.NORTH, authorLabel);
+		sLayout.putConstraint(SpringLayout.SOUTH, authorLabel, 31, SpringLayout.SOUTH, titleLabel);
 		sLayout.putConstraint(SpringLayout.WEST, authorLabel, 30, SpringLayout.WEST, bPanel);
 		bPanel.add(authorLabel);
 
@@ -218,7 +211,7 @@ public class ManageBooks {
 		bPanel.add(genreLabel);
 
 		totalPagesLabel = new JLabel("ページ数");
-		sLayout.putConstraint(SpringLayout.SOUTH, totalPagesLabel, 29, SpringLayout.SOUTH, genreLabel);
+		sLayout.putConstraint(SpringLayout.SOUTH, totalPagesLabel, 30, SpringLayout.SOUTH, genreLabel);
 		sLayout.putConstraint(SpringLayout.WEST, totalPagesLabel, 30, SpringLayout.WEST, bPanel);
 		bPanel.add(totalPagesLabel);
 
@@ -256,7 +249,9 @@ public class ManageBooks {
 		bPanel.add(inputGenre);
 
 		inputTotalPages = new JTextField();
+		sLayout.putConstraint(SpringLayout.SOUTH, inputTotalPages, 29, SpringLayout.SOUTH, inputGenre);
 		sLayout.putConstraint(SpringLayout.WEST, errorMessageLabel, 6, SpringLayout.EAST, inputTotalPages);
+
 		inputTotalPages.setPreferredSize(new Dimension(200, 24));
 		inputTotalPages.addKeyListener(new KeyListener() {
 			// キーが半角数字でない場合、入力を無視する
@@ -281,12 +276,22 @@ public class ManageBooks {
 		bPanel.add(inputTotalPages);
 		getBooksPanel.add(bPanel, BorderLayout.CENTER);
 
-		JButton btnNewButton = new JButton("UI");
-		sLayout.putConstraint(SpringLayout.NORTH, btnNewButton, 1, SpringLayout.NORTH, inputTotalPages);
-		sLayout.putConstraint(SpringLayout.WEST, btnNewButton, 0, SpringLayout.WEST, addBookButton);
-		sLayout.putConstraint(SpringLayout.EAST, btnNewButton, 0, SpringLayout.EAST, booksScrollPane);
-		bPanel.add(btnNewButton);
-
+		JButton uiButton = new JButton("UI");
+		sLayout.putConstraint(SpringLayout.NORTH, uiButton, 0, SpringLayout.NORTH, inputTotalPages);
+		sLayout.putConstraint(SpringLayout.SOUTH, uiButton, -1, SpringLayout.SOUTH, inputTotalPages);
+		sLayout.putConstraint(SpringLayout.WEST, uiButton, 0, SpringLayout.WEST, addBookButton);
+		sLayout.putConstraint(SpringLayout.EAST, uiButton, 0, SpringLayout.EAST, booksScrollPane);
+		bPanel.add(uiButton);
+		
+		sLayout.putConstraint(SpringLayout.NORTH, addBookButton, 0, SpringLayout.NORTH, inputTitle);
+		sLayout.putConstraint(SpringLayout.SOUTH, addBookButton, 0, SpringLayout.SOUTH, inputTitle);
+		sLayout.putConstraint(SpringLayout.EAST, addBookButton, -30, SpringLayout.EAST, bPanel);
+		
+		sLayout.putConstraint(SpringLayout.NORTH, deleteBookButton, 0, SpringLayout.NORTH, inputAuthor);
+		sLayout.putConstraint(SpringLayout.SOUTH, deleteBookButton, 00, SpringLayout.SOUTH, inputAuthor);
+		sLayout.putConstraint(SpringLayout.EAST, deleteBookButton, 0, SpringLayout.EAST, booksScrollPane);
+		
+		
 		List<Component> order = new ArrayList<>();
 		order.add(inputTitle);
 		order.add(inputAuthor);
@@ -297,6 +302,12 @@ public class ManageBooks {
 
 		mbController.setTraversalOrder(order, manageFrame);
 
+		addBookButton.setBackground(new Color(225, 238, 251));
+		deleteBookButton.setBackground(new Color(225, 238, 251));
+		uiButton.setBackground(new Color(225, 238, 251));
+		
+		Font allFont = new Font("メイリオ", Font.PLAIN, 12);
+		mbController.changeFont(bPanel, allFont);
 	}
 
 	/*
@@ -323,13 +334,16 @@ public class ManageBooks {
 	}
 
 	public void tableSettings(JTable table) {
+		bookListTable.setAutoCreateRowSorter(true);
+		bookListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
 		DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
 		centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-		bookListTable.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
 		bookListTable.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
 		bookListTable.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+		bookListTable.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
 
 		TableColumn title = bookListTable.getColumnModel().getColumn(0);
 		TableColumn author = bookListTable.getColumnModel().getColumn(1);
@@ -339,6 +353,13 @@ public class ManageBooks {
 		author.setPreferredWidth(60);
 		genre.setPreferredWidth(50);
 		pages.setPreferredWidth(30);
+		
+		// book_idのカラムは非表示にする
+		TableColumn bookIdColumn = bookListTable.getColumnModel().getColumn(4);
+		bookIdColumn.setMinWidth(0);
+		bookIdColumn.setMaxWidth(0);
+		bookIdColumn.setWidth(0);
+		bookIdColumn.setPreferredWidth(0);
 	}
 
 	public void addColumn(DefaultTableModel model) {

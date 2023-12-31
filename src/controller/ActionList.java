@@ -1,10 +1,14 @@
 package controller;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.util.List;
+
 import javax.swing.JComboBox;
 
 import dao.ProgressDAO;
-import window.ManageBooks;
 import window.Window;
+import window.sub.ManageBooks;
 
 public class ActionList {
 	private Window window;
@@ -34,8 +38,17 @@ public class ActionList {
 		
 	}
 
-//	public void reloadBookShelfCombo(int userId) {
-//		window.bookShelfCombo.setModel(controller.setBookList(userId));
-//	}
+	public void setFontColor(List<Component>  component,  int red, int green, int blue) {
+		for (Component comp : component) {
+		    comp.setForeground(new Color(red, green, blue));
+		}
+		
+	}
+	public void setBackGroundColor(List<Component>  component,  int red, int green, int blue) {
+		for (Component comp : component) {
+		    comp.setBackground(new Color(red, green, blue));
+		}
+		
+	}
 
 }

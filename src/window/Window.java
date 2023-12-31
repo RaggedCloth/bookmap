@@ -10,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -18,19 +19,22 @@ import javax.swing.table.DefaultTableModel;
 
 import controller.ActionList;
 import controller.Controller;
+import window.sub.ManageBooks;
 
 public abstract class Window {
 	protected int todayProgress;
 	public Controller controller = new Controller();
-	ActionList actionList;
+	public ActionList actionList;
+	
 	protected JFrame frame;
+	protected JPanel panel;
 	protected JButton bookListButton;
 	protected JButton inputButton;
 	protected JButton deleteButton;
 	protected JButton changeUI;
 	protected JLabel bookTitleLabel;
 	protected JLabel sumDaysAnsLabel;
-	protected JLabel rPAnsLabel;
+	protected JLabel remainPagesLabel;
 	protected JLabel avgPAnsLabel;
 	protected JLabel progressLabel;
 	protected JTable progressDataTable = new JTable();
@@ -44,7 +48,9 @@ public abstract class Window {
 	protected int bookId;
 	protected List<String> bookList;
 	protected ManageBooks mBooks;
-
+	protected JTextField inputRed;
+	protected JTextField inputGreen;
+	protected JTextField inputBlue;
 	public JComboBox<String> getBookShelfCombo() {
 		return bookShelfCombo;
 	}
@@ -53,7 +59,7 @@ public abstract class Window {
 		this.bookShelfCombo = bookShelfCombo;
 	}
 
-	abstract protected void run();
+	abstract public void run();
 
 	abstract protected void stop();
 
@@ -81,7 +87,7 @@ public abstract class Window {
 		});
 	}
 
-	protected void updateBookShlefCombo() {
+	public void updateBookShlefCombo() {
 		int beforeIndex = bookShelfCombo.getSelectedIndex();
 
 		comboModel = controller.setBookList(userId);
@@ -90,7 +96,7 @@ public abstract class Window {
 		bookShelfCombo.setSelectedIndex(beforeIndex);
 	}
 
-	protected void updateBookShlefCombo(int deletedIndex) {
+	public void updateBookShlefCombo(int deletedIndex) {
 		int beforeIndex = bookShelfCombo.getSelectedIndex(); //選択していたアイテムの要素番号を取得
 
 		comboModel = controller.setBookList(userId);
