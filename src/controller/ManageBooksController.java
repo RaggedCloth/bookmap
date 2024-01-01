@@ -10,16 +10,46 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.event.TableModelEvent;
 
+import dao.BookShelfDAO;
+import dao.BooksDAO;
 import window.sub.ManageBooks;
 
 public class ManageBooksController  {
 	ManageBooks mBooks;
-	ShowController showC = new ShowController();
-
+	BooksDAO bdao;
+	BookShelfDAO bsdao;
+	
 	public ManageBooksController(ManageBooks mBooks) {
 		this.mBooks = mBooks;
 	}
 
+	 /*
+     * BookShelfのTableModelの受け取り
+     */
+    public List<String[]> getBookShelfList(int userId) {
+        bsdao = new BookShelfDAO();
+        return bsdao.createManageBooksList(userId);
+    }
+    /*
+     * 本棚に本を追加
+     */
+    public String addBook(int userId, String title, String authorName, String genreName, int totalPages) {
+        String result;
+        bdao.registerBook(userId, title, authorName, genreName, totalPages);
+        result = "登録しました。";
+        return result;
+    }
+    
+    public void deleteBookByTable(int userId, int bookId) {
+        bsdao = new BookShelfDAO();
+        bsdao.deleteBook(userId, bookId);
+    }
+    
+    public String editBookData(int bookId, String columnName, String editedData) {
+        bsdao = new BookShelfDAO();
+        return bsdao.updateBookData(bookId, columnName, editedData);
+    }
+    
 	public void updatedProcess(TableModelEvent e) {
 		// 選択されたセルを特定
 		int sortedRow = e.getFirstRow();
@@ -37,7 +67,7 @@ public class ManageBooksController  {
 		//editBookDataのoriginalRowの引数をbookIdに変える
 		if (editedDataObject instanceof String && !editedDataObject.equals(oldDataObject)) {
 			String editedData = (String) editedDataObject;
-			String updatedMessage = showC.editBookData(bookId, columnName, editedData);
+			String updatedMessage = editBookData(bookId, columnName, editedData);
 			mBooks.displayUpdatedMessage(updatedMessage);
 		}
 	}

@@ -42,7 +42,7 @@ public class LoginForm {
         loginForm = new JFrame();
         loginForm.setTitle("Please Login");
         loginForm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        loginForm.setBounds(1100, 100, 525, 310);
+        loginForm.setBounds(700, 300, 525, 310);
         loginForm.setResizable(false);
 
         /*
@@ -58,14 +58,14 @@ public class LoginForm {
          */
         userName = new JLabel("LOGIN ID");
         userName.setForeground(Color.BLACK);
-        userName.setFont(new Font("メイリオ", Font.PLAIN, 20));
-        userName.setBounds(80, 66, 193, 52);
+        userName.setFont(new Font("メイリオ", Font.PLAIN, 19));
+        userName.setBounds(60, 70, 193, 52);
         loginPanel.add(userName);
 
         password = new JLabel("PASSWORD");
         password.setForeground(Color.BLACK);
-        password.setFont(new Font("メイリオ", Font.PLAIN, 20));
-        password.setBounds(80, 120, 193, 52);
+        password.setFont(new Font("メイリオ", Font.PLAIN, 19));
+        password.setBounds(60, 120, 193, 52);
         loginPanel.add(password);
 
         messageLabel = new JLabel("welcome to Bookmap");
@@ -81,7 +81,7 @@ public class LoginForm {
         subscribeButton.setFont(new Font("メイリオ", Font.PLAIN, 12));
         subscribeButton.setForeground(new Color(40, 40, 40));
         subscribeButton.setBackground(new Color(225, 238, 251));
-        subscribeButton.setBounds(299, 180, 80, 30);
+        subscribeButton.setBounds(280, 180, 80, 30);
         subscribeButton.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
@@ -122,7 +122,7 @@ public class LoginForm {
         loginButton.setFont(new Font("メイリオ", Font.BOLD, 12));
         loginButton.setForeground(new Color(40, 40, 40));
         loginButton.setBackground(new Color(225, 238, 251));
-        loginButton.setBounds(200, 180, 80, 30);
+        loginButton.setBounds(180, 180, 80, 30);
         loginButton.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
@@ -160,14 +160,14 @@ public class LoginForm {
          */
         loginIdField = new JTextField();
         loginIdField.setFont(new Font("Tahoma", Font.PLAIN, 21));
-        loginIdField.setBounds(200, 77, 180, 35);
+        loginIdField.setBounds(180, 77, 180, 35);
         loginPanel.add(loginIdField);
 
         passwordField = new JPasswordField();
         ActionListener[] loginEvent = loginButton.getActionListeners(); // loginButtonのActionListenerの配列を入れる
         passwordField.addActionListener(loginEvent[0]);
         passwordField.setFont(new Font("Tahoma", Font.PLAIN, 21));
-        passwordField.setBounds(200, 127, 180, 35);
+        passwordField.setBounds(180, 127, 180, 35);
         loginPanel.add(passwordField);
         
     }
