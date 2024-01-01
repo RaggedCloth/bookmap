@@ -30,12 +30,9 @@ import javax.swing.table.TableCellRenderer;
 
 import controller.ActionList;
 import controller.Controller;
-import controller.ShowController;
 import window.Window;
 
 public class TestUI extends Window {
-
-	protected ShowController showC;
 
 	/**
 	 * Create the frame.
@@ -54,7 +51,6 @@ public class TestUI extends Window {
 		this.bookId = previousBookId;
 
 		Window testUI = this;
-		showC = new ShowController(userId, bookId);
 		actionList = new ActionList(this);
 		controller = new Controller();
 
@@ -127,7 +123,7 @@ public class TestUI extends Window {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String bookTitle = String.valueOf(bookShelfCombo.getSelectedItem());
-				bookId = showC.getBookId(userId, bookTitle);
+				bookId = controller.getBookId(userId, bookTitle);
 				updateText(userId, bookId);
 			}
 		});
@@ -256,7 +252,7 @@ public class TestUI extends Window {
 					return;
 				} else {
 					todayProgress = Integer.valueOf(inputTodayPages.getText());
-					showC.addRecentData(userId, bookId, todayProgress);
+					controller.addRecentData(userId, bookId, todayProgress);
 					inputTodayPages.setText(null);
 				}
 				updateText(userId, bookId);
@@ -342,6 +338,7 @@ public class TestUI extends Window {
 	public void adjustableFontSize(int userId, int bookId) {
 		String title = controller.setBookTitle(userId, bookId);
 		bookTitleLabel.setText(title);
+		
 		int variable = title.length() / 10;
 		if (variable == 0) {
 			bookTitleLabel.setFont(new Font("メイリオ", Font.PLAIN, 30));

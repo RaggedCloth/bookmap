@@ -212,6 +212,14 @@ public class Controller extends DefaultComboBoxModel<String> {
 		return check;
 	}
 
+    public int getBookId(int userId, String bookTitle) {
+        return pdao.searchBookId(userId, bookTitle);
+    }
+    
+    public void addRecentData(int userId, int bookId, int totalPages) {
+        pdao.insertTodayPage(userId, bookId, totalPages);
+    }
+    
 	public void deleteSelectedData(int userId, int progressId) {
 		pdao.delete(userId, progressId);
 	}

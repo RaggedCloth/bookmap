@@ -119,7 +119,10 @@ public class ProgressDAO {
         LocalDate pastDate = createdAt.toLocalDateTime().toLocalDate();
         
         int diffDays = today.getDayOfYear() - pastDate.getDayOfYear();
-        
+        int diffYears = today.getYear() - pastDate.getYear();
+        if (diffYears > 0) {
+        	diffDays += 365*diffYears;
+        }
         if (diffDays == 0) {
         	return String.format("今日");
         	

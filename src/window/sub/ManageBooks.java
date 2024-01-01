@@ -31,7 +31,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import controller.ManageBooksController;
-import controller.ShowController;
 import window.Window;
 
 public class ManageBooks {
@@ -63,7 +62,6 @@ public class ManageBooks {
 	LabelTimer labelTimer;
 	Timer timer;
 	int sec = 0;
-	ShowController showC;
 	ManageBooksController mbController;
 
 	public ManageBooks(int userId, Window window) {
@@ -81,7 +79,6 @@ public class ManageBooks {
 		bPanel.setLayout(sLayout);
 		bPanel.setBackground(new Color(250, 250, 250));
 
-		showC = new ShowController();
 		mbController = new ManageBooksController(this);
 		/*
 		 * Table
@@ -94,7 +91,7 @@ public class ManageBooks {
 		addColumn(copyOfBooksModel);
 
 		List<String[]> booksData = new ArrayList<>();
-		booksData = showC.getBookShelfList(userId);
+		booksData = mbController.getBookShelfList(userId);
 		for (String[] bd : booksData) {
 			booksModel.addRow(bd);
 			copyOfBooksModel.addRow(bd);
@@ -109,7 +106,7 @@ public class ManageBooks {
 		booksModel.addTableModelListener(new TableModelListener() {
 			/*
 			 * Tableの編集処理
-			 * row,columnをshowCからDAOに送ってその結果をJLabelで受け取る
+			 * row,columnをDAOに送ってその結果をJLabelで受け取る
 			 */
 			@Override
 			public void tableChanged(TableModelEvent e) {
@@ -144,7 +141,7 @@ public class ManageBooks {
 				if (numberVaridator(totalPagesText)) {
 					try {
 						addTotalPages = Integer.parseInt(totalPagesText);
-						String result = showC.addBook(userId, addTitle, addAuthor, addGenre, addTotalPages);
+						String result = mbController.addBook(userId, addTitle, addAuthor, addGenre, addTotalPages);
 						System.out.println(result);
 						clearText(bPanel);
 						window.updateBookShlefCombo();
@@ -180,7 +177,7 @@ public class ManageBooks {
 							"「 " + bookTitle + " 」の進捗データは失われます。本当に削除しますか？", "注意", JOptionPane.YES_NO_OPTION,
 							JOptionPane.WARNING_MESSAGE);
 					if (userAnswer == JOptionPane.YES_OPTION) {
-						showC.deleteBookByTable(userId, bookId);
+						mbController.deleteBookByTable(userId, bookId);
 						updateFrame(userId);
 						window.updateBookShlefCombo(modelRow);
 					} else if (userAnswer == JOptionPane.NO_OPTION) {
@@ -326,7 +323,7 @@ public class ManageBooks {
 		booksModel.setRowCount(0);
 		copyOfBooksModel.setRowCount(0);
 		List<String[]> booksData = new ArrayList<>();
-		booksData = showC.getBookShelfList(userId);
+		booksData = mbController.getBookShelfList(userId);
 		for (String[] bd : booksData) {
 			booksModel.addRow(bd);
 			copyOfBooksModel.addRow(bd);
