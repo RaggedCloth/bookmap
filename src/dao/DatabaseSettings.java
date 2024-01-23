@@ -10,7 +10,7 @@ import java.util.Properties;
 public class DatabaseSettings {
 
     // プロパティファイルのパスを指定
-    private static final String mySqlProperties = System.getProperty("user.dir") + "\\src\\mysql.properties";
+    private static final String mySqlProperties = System.getProperty("user.dir") + "/mysql.properties";
 
     public static Connection getConnection() {
         try {
