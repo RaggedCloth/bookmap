@@ -14,12 +14,13 @@
 ![ManageBooksWindow](https://github.com/kendama5ko/bookmap/assets/146686157/515fee1b-fc14-45f2-83cb-d6b25174c1f9)
 
 ## 準備
-1. mysql.propertiesというファイルを追加する。
-2. MySQLにbookmapというデータベースを追加し、必要なテーブルを作成する。
+本アプリではMySQLとの接続を必要とします。  
+そのために次の2つの準備を事前にお願いします。  
+1. mysql.propertiesというファイルを追加（プログラムとMySQLを接続する設定ファイル）
+2. createDatabase.sqlを実行（MySQLにbookmapというデータベースを追加し、必要なテーブルを作成）
 
 ### 1. MySQLとの接続 
-本アプリではMySQLとの接続を必要とします。
-初めに、メモ帳やテキストエディタを開き、次のように記述してください。  
+メモ帳やテキストエディタを開き、次のように記述してください。  
 ```
 # MySQL settings
 URL=jdbc:mysql://localhost:3306/bookmap
